@@ -1,0 +1,34 @@
+.menu-content-wrapper{
+    margin: 10px;
+}
+
+.nav-items {
+    background-color: rgb(255, 225, 170);
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    border-radius: 15px;
+}
+
+.nav-item {
+    flex: 1;
+    text-align: center;
+    padding: 10px 15px;
+    font-size: 1em;
+    transition: all 0.2s ease;
+}
+
+.nav-item-selected{
+    background-color: rgb(255, 119, 0);
+    color: #fff;
+    border: 1px solid rgb(254, 124, 10);
+    border-radius: 15px;
+    transition: all 0.2s ease;
+}
+
+.nav-item-content-load{
+    height: 80vh;
+    overflow-y: auto; /* Enable vertical scrolling */
+    overflow-x: hidden; /* Hide horizontal scrollbar if not needed */
+    padding-bottom: 150px;
+}

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orders</title>
+
+    <link rel="stylesheet" href="./orders-app/orders.css">
+    <link rel="stylesheet" href="orders.css">
+</head>
+
+<body>
+    <div class="body-wrapper">
+        <!-- <div class="orders-head">
+            ALL ORDERS
+            <div class="searchFilter">
+                <input type="text" class="searchBox" id="searchBox" placeholder="Search Box">
+            </div>
+        </div> -->
+
+        <div class="orders-head">
+            <div class="orders-title">
+                ALL ORDERS 
+                <div class="refresh-btn" id="refresh-btn-orders" data-tooltip="Sync All Orders">
+                    <i class="fas fa-sync-alt"></i>
+                </div>
+            </div>
+
+            <div class="searchFilter">
+                <select id="filterType" class="filter-type">
+                    <option disabled selected>Filter Search</option>
+                    <option value="mobile">Mobile</option>
+                    <option value="date">Date</option>
+                    <option value="orderType">Order Type</option>
+                    <option value="reset">Reset</option>
+                </select>
+                <div id="filterInputs" class="filter-inputs">
+                    <input type="text" class="searchBox" id="mobileInput" placeholder="Enter mobile number"
+                        style="display:none;">
+                    <div id="dateInputs" class="searchDate" style="display:none;">
+                        <input type="date" id="startDate" placeholder="mm-dd-yyy">
+                        <input type="date" id="endDate" placeholder="mm-dd-yyy">
+                    </div>
+                    <select id="orderTypeSelect" class="searchType" style="display:none;">
+                        <option disabled selected>Select Type</option>
+                        <option value="dine_in">DINE IN</option>
+                        <option value="takeaway">TAKEAWAY</option>
+                        <option value="delivery">DELIVERY</option>
+                        <option value="hotel">HOTEL</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="filter-wrapper">
+
+        </div>
+
+
+        <div class="all-orders">
+            <div class="orders-wrapper">
+                <div class="orders-list-head">
+                    <div class="olhead-item col-1">OrderId</div>
+                    <div class="olhead-item col-2">Mobile</div>
+                    <div class="olhead-item col-2">Date</div>
+                    <div class="olhead-item col-2">Type</div>
+                    <div class="olhead-item col-2">Total (inc. GST)</div>
+                    <div class="olhead-item col-2">Status</div>
+                    <div class="olhead-item col-1">Details</div>
+                </div>
+                <div class="load-orders"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-container">
+        <div id="orderModal" class="orderDetailModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span class="close">&times;</span>
+                    <div class="modal-title">Order Details</div>
+                </div>
+                <div id="orderDetails">
+                    <!-- Data will be dynamically added here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Payment Order-->
+    <div class="modal-container2">
+        <div id="paymentModal" class="payment-modal">
+            <div class="modal-content">
+                <div class="modal-head">
+                    <span class="close-payment">&times;</span>
+                    <div class="modal-title">COLLECT PAYMENT</div>
+                </div>
+                <div class="modal-body">
+                    <div class="generate-bill-form">
+
+                        <div class="input-group-bill">
+                            <label for="order-id">Bill No.</label>
+                            <input type="text" id="order-id" placeholder="Bill No." disabled>
+                        </div>
+                        
+                        <div class="input-group-bill">
+                            <label for="net-amt">Net Amount (₹):</label>
+                            <input type="number" id="net-amt" placeholder="0.00" disabled>
+                        </div>
+                        <div class="input-group-bill">
+                            <label for="paid-amt">Paid Amount (₹):</label>
+                            <input type="number" id="paid-amt" placeholder="0.00">
+                        </div>
+
+                        <label for="">Payment Method:</label>
+                        <div class="payment-method">
+                            <div class="pm-check pm-check-inline">
+                                <input class="form-check-input" type="radio" name="paymentMethod" id="cash" value="cash">
+                                <label class="form-check-label" for="cash">Cash</label>
+                            </div>
+                            <div class="pm-check pm-check-inline">
+                                <input class="form-check-input" type="radio" name="paymentMethod" id="card" value="card">
+                                <label class="form-check-label" for="card">Card</label>
+                            </div>
+                            <div class="pm-check pm-check-inline">
+                                <input class="form-check-input" type="radio" name="paymentMethod" id="upi" value="upi">
+                                <label class="form-check-label" for="upi">UPI</label>
+                            </div>
+                            <div class="pm-check pm-check-inline">
+                                <input class="form-check-input" type="radio" name="paymentMethod" id="due" value="due">
+                                <label class="form-check-label" for="due">Due</label>
+                            </div>
+                            <div class="pm-check pm-check-inline">
+                                <input class="form-check-input" type="radio" name="paymentMethod" id="other" value="other">
+                                <label class="form-check-label" for="other">Other</label>
+                            </div>
+                        </div>
+                       
+                        
+                        
+                       
+                        <div class="input-group-bill customer_gst">
+                            <label for="payment-message">Message:</label>
+                            <input type="text" id="payment-message" placeholder="Info about payment">
+                        </div>
+
+
+
+                    </div>
+
+                    <div class="button-groups">
+                        <button class="print-bill-btn" id="payment-btn">COLLECT PAYMENT</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script src="./../../common.js"></script>
+    <script src="orders.js"></script>
+</body>
+
+</html>

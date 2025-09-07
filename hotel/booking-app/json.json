@@ -1,0 +1,382 @@
+{
+    "id": 4,
+    "tenant": 1,
+    "bill_no": 4,
+    "res_bill_no": null,
+    "hot_bill_no": 2,
+    "gst_bill_no": "HOT/4/2",
+    "customer_gst": null,
+    "bill_type": "HOT",
+    "order_id": null,
+    "booking_id": 2,
+    "total": "5871.93",
+    "discount": "0.00",
+    "discounted_amount": "5871.93",
+    "room_sgst": "60.00",
+    "room_cgst": "60.00",
+    "order_sgst": "101.80",
+    "order_cgst": "101.80",
+    "service_sgst": "0.00",
+    "service_cgst": "0.00",
+    "sgst_amount": "161.80",
+    "cgst_amount": "161.80",
+    "net_amount": "6195.53",
+    "status": "paid",
+    "created_at": "2024-11-14T19:23:11.573583Z",
+    "created_by": 2,
+    "modified_at": [],
+    "modified_by": [],
+    "room_details": [
+        {
+            "room_id": 1,
+            "room_price": 1000,
+            "days_stayed": 1,
+            "total": 1000,
+            "cgst": 60,
+            "sgst": 60
+        }
+    ],
+    "service_details": [
+        {
+            "room_id": 2,
+            "service_id": 2,
+            "service_name": "Service2",
+            "price": 500,
+            "cgst": 0,
+            "sgst": 0
+        },
+        {
+            "room_id": 2,
+            "service_id": 1,
+            "service_name": "Service1",
+            "price": 300,
+            "cgst": 0,
+            "sgst": 0
+        }
+    ],
+    "order_details": [
+        {
+            "order_id": 3,
+            "total": 2049.97,
+            "cgst": 51.25,
+            "sgst": 51.25
+        },
+        {
+            "order_id": 4,
+            "total": 2021.96,
+            "cgst": 50.55,
+            "sgst": 50.55
+        }
+    ],
+    "bookingData": {
+        "id": 2,
+        "booking_date": "2024-11-14T19:10:26.330372Z",
+        "status": "checked_out",
+        "total_amount": "0.00",
+        "tenant": 1,
+        "guest_detail": [
+            {
+                "id": 3,
+                "username": "1234567890",
+                "email": "test@gmail.com",
+                "first_name": "test",
+                "last_name": "test",
+                "phone": "1234567890",
+                "address_line_1": "xx",
+                "address_line_2": "indian nagaland"
+            }
+        ],
+        "rooms": [
+            {
+                "id": 2,
+                "booking": 2,
+                "room": 1,
+                "start_date": "2024-11-15T12:00:00Z",
+                "end_date": "2024-11-17T12:00:00Z",
+                "is_active": false,
+                "check_in_details": {
+                    "id": 2,
+                    "room_booking": 2,
+                    "check_in_date": "2024-11-15T12:48:00Z",
+                    "checked_in_by": 2,
+                    "guests": [
+                        {
+                            "id": 3,
+                            "email": "test@gmail.com",
+                            "first_name": "test",
+                            "last_name": "test",
+                            "phone": "1234567890",
+                            "address_line_1": "xx",
+                            "address_line_2": "indian nagaland",
+                            "guest_details": {
+                                "coming_from": "xx",
+                                "going_to": "xx",
+                                "purpose": "xx",
+                                "guest_id": [],
+                                "foreigner": false,
+                                "c_form": null
+                            }
+                        }
+                    ]
+                },
+                "check_out_date": "2024-11-17T06:22:00Z",
+                "checked_out_by": 2,
+                "service_usages": [
+                    {
+                        "id": 1,
+                        "booking_id": 2,
+                        "room_id": 1,
+                        "service_id": 2,
+                        "service_name": "Service2",
+                        "usage_date": "2024-11-14T19:21:24.408809Z"
+                    },
+                    {
+                        "id": 2,
+                        "booking_id": 2,
+                        "room_id": 1,
+                        "service_id": 1,
+                        "service_name": "Service1",
+                        "usage_date": "2024-11-14T19:22:08.560000Z"
+                    }
+                ],
+                "orders": [
+                    {
+                        "id": 3,
+                        "tenant": 1,
+                        "customer": {
+                            "id": 3,
+                            "username": "1234567890",
+                            "email": "test@gmail.com",
+                            "first_name": "test",
+                            "last_name": "test",
+                            "phone": "1234567890",
+                            "address_line_1": "xx",
+                            "address_line_2": "indian nagaland"
+                        },
+                        "created_at": "2024-11-14T19:19:07.676608Z",
+                        "modified_at": [
+                            "2024-11-14T19:19:22.140557+00:00"
+                        ],
+                        "modified_by": [
+                            2
+                        ],
+                        "status": "settled",
+                        "order_type": "hotel",
+                        "tables": [],
+                        "room_id": 1,
+                        "booking_id": 2,
+                        "food_items": [
+                            3,
+                            5,
+                            8,
+                            9,
+                            10
+                        ],
+                        "quantity": [
+                            1,
+                            1,
+                            1,
+                            1,
+                            1
+                        ],
+                        "notes": "",
+                        "kot_count": 0,
+                        "total": "2049.97",
+                        "phone": "1234567890"
+                    },
+                    {
+                        "id": 4,
+                        "tenant": 1,
+                        "customer": {
+                            "id": 3,
+                            "username": "1234567890",
+                            "email": "test@gmail.com",
+                            "first_name": "test",
+                            "last_name": "test",
+                            "phone": "1234567890",
+                            "address_line_1": "xx",
+                            "address_line_2": "indian nagaland"
+                        },
+                        "created_at": "2024-11-14T19:19:46.263330Z",
+                        "modified_at": [
+                            "2024-11-14T19:20:23.401006+00:00"
+                        ],
+                        "modified_by": [
+                            2
+                        ],
+                        "status": "settled",
+                        "order_type": "hotel",
+                        "tables": [],
+                        "room_id": 1,
+                        "booking_id": 2,
+                        "food_items": [
+                            1,
+                            6,
+                            7,
+                            8,
+                            12
+                        ],
+                        "quantity": [
+                            1,
+                            1,
+                            1,
+                            1,
+                            1
+                        ],
+                        "notes": "",
+                        "kot_count": 0,
+                        "total": "2021.96",
+                        "phone": "1234567890"
+                    }
+                ]
+            }
+        ],
+        "id_card": null
+    }
+}
+
+
+this is the item object here we have all data for hotel bill required for printing bill
+now i want to generate a bill with this data, but i want to generate a bill with the following format
+room details and service details should be in one page and order details should be in another page
+
+for room details - we have room_details with room_id, room_price, days_stayed, total, cgst, sgst
+- room_id is the room number
+- room_price is the price of the room per day
+- days_stayed is the number of days the room was booked for
+- total is the total price of the room for the stay
+- cgst is the cgst on the room price
+- sgst is the sgst on the room price
+- net total should be all_room_total + all_room_cgst + all_room_sgst
+
+for service details - we have service_details with room_id, service_id, service_name, price, cgst, sgst
+- room_id is the room number
+- service_id is the service id
+- service_name is the name of the service
+- price is the price of the service
+- cgst is the cgst on the service price (no need to display in bill)
+- sgst is the sgst on the service price (no need to display in bill)
+- net total should be all_service_total + all_service_cgst + all_service_sgst
+
+for order details - we have order_details with order_id, total, cgst, sgst
+to get the order details we need to get the order data from local storage ordersList using getAllOrdersFromStorage()
+
+{
+    "id": 4,
+    "tenant": 1,
+    "customer": {
+        "id": 3,
+        "username": "1234567890",
+        "email": "test@gmail.com",
+        "first_name": "test",
+        "last_name": "test",
+        "phone": "1234567890",
+        "address_line_1": "xx",
+        "address_line_2": "indian nagaland"
+    },
+    "created_at": "2024-11-14T19:19:46.263330Z",
+    "modified_at": [
+        "2024-11-14T19:20:23.401006+00:00"
+    ],
+    "modified_by": [
+        2
+    ],
+    "status": "settled",
+    "order_type": "hotel",
+    "tables": [],
+    "room_id": 1,
+    "booking_id": 2,
+    "food_items": [
+        1,
+        6,
+        7,
+        8,
+        12
+    ],
+    "quantity": [
+        1,
+        1,
+        1,
+        1,
+        1
+    ],
+    "notes": "",
+    "kot_count": 0,
+    "total": "2021.96",
+    "phone": "1234567890"
+}
+
+here we have the order details at food_items with its quantity in quantity respectively
+for name of the food items we need to get the food items from local storage allFoodList using getCategoryListFromStorage()
+for each orders i need a separate page and for each page if there is more than 10 items then we need to create a new page
+
+Help me create the bill in the above format
+
+
+function generateBillHeader() {
+    return `
+        <header class="bill-header">
+            <div class="header-content">
+                <div class="logo">
+                    <img src="./../order_bill/logo.png" alt="Restaurant Logo" class="restaurant-logo">
+                </div>
+                <div class="restaurant-details">
+                    <h3>Hotel Iswar & Family Restaurant</h3>
+                    <p> Central Road, Silchar, Assam, 788001</p>
+                    <p> +91 38423 19540 / +91 6003704064</p>
+                    <p> www.hoteliswar.in</p>
+                    <p>GST No: 18BDXPS2451N1ZK</p>
+                </div>
+            </div>
+        </header>
+    `;
+}
+
+function generateInvoiceSection() {
+    return `
+        <section class="invoice-customer-info">
+            <div class="invoice-info">
+                <h3>Invoice</h3>
+                <div>Bill No: <span id="bill-number"> </span></div>
+                <div>GST Bill No: <span id="gst-bill-number"> </span></div>
+                <!-- <div>Date: <span id="bill-date"></span></div> -->
+                <div>Table: <span id="table-number"> </span></div>
+                <div>Order Type: <span id="order-type"> </span></div>
+            </div>
+
+            <div class="bill-details">
+                <h3>Customer Details</h3>
+                <div>Name: <span id="customer-name">  </span></div>
+                <div>Email: <span id="customer-email">  </span></div>
+                <div>Phone: <span id="customer-phone">  </span></div>
+                <div>GST No.: <span id="customer-gstno">  </span></div>
+            </div>
+        </section>
+    `;
+}
+
+function generateFooter() {
+    return `
+    
+        <footer class="bill-footer">
+            <div class="kot-section">
+                <div class="kot-head">Kot Nos #</div>
+                <div class="kot-nos"></div>
+            </div>
+
+            <div class="cashier-info">
+                <div class="cashier-name">Cashier: </div>
+                <div class="name"></div>
+                <div class="cashier-date"></div>
+            </div>
+
+            <div class="license-nos">
+                <div class="fssai">FSSAI LICENSE NO: 1234567890</div>
+            </div>
+
+            <div class="bill-footer-text">
+                * * * Thank you for Dining with us! * * *
+            </div>
+        </footer>
+    `;
+}

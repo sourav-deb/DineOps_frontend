@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Take Order</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Free Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="takeorder.css">
+
+
+    <script src="https://printjs-4de6.kxcdn.com/print.min.js"></script>
+    <link rel="stylesheet" href="https://printjs-4de6.kxcdn.com/print.min.css">
+
+</head>
+
+<body>
+    <div class="header">
+        <!-- logo -->
+        <img src="./../../assets/image/logo.png" alt="Hotel Iswar Logo" class="logo">
+        <div class="header-title">Hotel Iswar</div>
+        <div class="header-items">
+            <ul>
+                <li><a href="./../table-info/neworder.html">New Order</a></li>
+                <!-- <li class="support">Call For Support <br> 7002246506</li> -->
+                <li><a href="./../../dashboard/dashboard.html">Dashboard</a></li>
+                <li><a href="./../../hotel/hotel.html">Hotel</a></li>
+                <li id="logout">Logout</li>
+            </ul>
+        </div>
+    </div>
+    <div class="screen-wrap ">
+        <div class="row">
+            <div class="menu-catg col-2">
+                <div class="menu-category-head">
+                    <div class="category-name">
+                        FOOD CATEGORY
+                    </div>
+                </div>
+                <div class="menu-category">
+                    <!-- Here goes the list of Categories -->
+                    <!-- <div class="menu-category-item">
+                        <div class="category-name" id="category-1">
+                            Indian
+                        </div>
+                    </div>
+                    <div class="menu-category-item">
+                        <div class="category-name">
+                            Starters
+                        </div>
+                    </div> -->
+
+
+                </div>
+            </div>
+            <div class="items-list col-5">
+                <div class="searchitems">
+                    <input type="text" id="search-input" class="search-input" placeholder="Search Item">
+                </div>
+                <div class="menu-items"></div>
+            </div>
+            <div class="bill-info col-5">
+                <div class="delivery-catg">
+                    <div class="row">
+                        <div class="col-9">
+                            <div class="mobile-no">
+                                <label for="mobile-input">Mobile</label>
+                                <input type="text" class="mobile-no-input" id="mobile-input"
+                                    placeholder="Customer Mobile No.">
+                            </div>
+                            <div class="order-type row">
+                                Order Type: &nbsp;
+                                <div class="get-order-type col-5"></div>
+                                <div class="get-order-type-info col-3"></div>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div id="moreButton" class="more-button">
+                                <div class="morebutton-text">
+                                    <i class="fa-solid fa-circle-arrow-left"></i> &nbsp; MORE
+                                </div>
+                            </div>
+
+                            <!-- More Modal -->
+                            <div id="overlay" class="overlay"></div>
+
+                            <div id="morePopup" class="popup">
+                                <div class="popup-content">
+                                    <div class="popup-title">Customer Info</div>
+                                    <span class="close-btn">&times;</span>
+
+                                    <div class="input-group">
+                                        <label for="mobile">Mobile: </label>
+                                        <input type="text" id="mobile" placeholder="Customer Mobile"
+                                            autocomplete="mobile">
+                                    </div>
+                                    <div class="input-group">
+                                        <label for="name">First Name: </label>
+                                        <input type="text" id="name" placeholder="Customer First Name"
+                                            autocomplete="name">
+                                    </div>
+                                    <div class="input-group">
+                                        <label for="lname">Last Name: </label>
+                                        <input type="text" id="lname" placeholder="Customer Last Name"
+                                            autocomplete="lname">
+                                    </div>
+
+                                    <div class="input-group">
+                                        <label for="email">Email: </label>
+                                        <input type="email" id="email" placeholder="Customer Email"
+                                            autocomplete="email">
+                                    </div>
+                                    <div class="input-group">
+                                        <label for="address">Address: </label>
+                                        <!-- <input type="email" id="address" placeholder="Customer Email"> -->
+                                        <textarea name="address" id="address" placeholder="Full Address" cols="50"
+                                            rows="3" autocomplete="address"></textarea>
+                                    </div>
+
+                                    <div class="button-group">
+                                        <div class="delivery-catgeory">Order Type: </div>
+                                        <button class="type-selectable">DINE-IN</button>
+                                        <button class="type-selectable">DELIVERY</button>
+                                        <button class="type-selectable">TAKE-AWAY</button>
+                                        <button class="type-selectable">HOTEL</button>
+                                        <div class="order-type-options"></div>
+                                    </div>
+
+
+                                    <button id="doneButton" class="doneButton">Done</button>
+                                </div>
+                            </div>
+                            <!--End More Modal -->
+                        </div>
+                    </div>
+                </div>
+                <div class="bill-head">
+                    <div class="all-names">ITEMS</div>
+                    <div class="all-qty">QTY</div>
+                    <div class="all-prices">PRICE</div>
+                </div>
+                <div class="bill-container">
+                    <div class="bill-watermark"><i class="fa-solid fa-utensils fa-5x"></i></div>
+                </div>
+                <div class="bill-footer">
+                    <div class="total-amt">
+                        <div class="order-note">
+                            <input type="text" class="order-note-input" name="order-note" id="order-note"
+                                placeholder="Order Note">
+                        </div>
+
+                        <div class="total-amount " style="display: none;">
+                            Total: <span class="ta-price">₹0.00</span>
+                        </div>
+                        <div class="discount " style="display: none;">
+                            Discount:
+                            <input type="number" class="disc-box" name="discount" id="discount">
+                        </div>
+
+                        <div class="net-amt">
+                            Sub Total: <span class="na-price">₹0.00</span>
+                        </div>
+                    </div>
+                    <div class="button-groups">
+                        <button class="save-btn">Save</button>
+                        <!-- <button class="print-btn" disabled>Print</button> -->
+                        <button class="kot-btn" disabled>KOT</button>
+                        <button class="hold-btn" disabled>Hold</button>
+                        <button class="cancelled-btn" disabled>Canc.</button>
+                    </div>
+                    <div class="payment-method" style="display: none;">
+                        <div class="pm-check pm-check-inline">
+                            <input class="form-check-input" type="radio" name="paymentMethod" id="cash" value="cash">
+                            <label class="form-check-label" for="cash">Cash</label>
+                        </div>
+                        <div class="pm-check pm-check-inline">
+                            <input class="form-check-input" type="radio" name="paymentMethod" id="card" value="card">
+                            <label class="form-check-label" for="card">Card</label>
+                        </div>
+                        <div class="pm-check pm-check-inline">
+                            <input class="form-check-input" type="radio" name="paymentMethod" id="upi" value="upi">
+                            <label class="form-check-label" for="upi">UPI</label>
+                        </div>
+                        <div class="pm-check pm-check-inline">
+                            <input class="form-check-input" type="radio" name="paymentMethod" id="due" value="due">
+                            <label class="form-check-label" for="due">Due</label>
+                        </div>
+                        <div class="pm-check pm-check-inline">
+                            <input class="form-check-input" type="radio" name="paymentMethod" id="other" value="other">
+                            <label class="form-check-label" for="other">Other</label>
+                        </div>
+                    </div>
+                    <div class="settle-bill">
+                        <button class="settle-btn" disabled>GENERATE BILL</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Modal for Settling Bill-->
+    <!-- Modal: View Data from bookings -->
+    <div class="modal-container">
+        <div id="settleModal" class="settle-modal">
+            <div class="modal-content">
+                <div class="modal-head">
+                    <span class="close-settle">&times;</span>
+                    <div class="modal-title">GENERATE BILL</div>
+                </div>
+                <div class="modal-body">
+                    <div class="generate-bill-form">
+                        <div class="input-group-bill">
+                            <label for="bill-no">Order No.</label>
+                            <input type="text" id="bill-no" placeholder="Bill No." disabled>
+                        </div>
+                        
+                        <div class="input-group-bill">
+                            <label for="sub-total">Sub Total (₹):</label>
+                            <input type="number" id="sub-total" placeholder="0.00" disabled>
+                        </div>
+                        <div class="input-group-bill">
+                            <label for="bill-discount">Discount (₹):</label>
+                            <input type="number" id="bill-discount" placeholder="0.00">
+                        </div>
+                        <div class="input-group-bill">
+                            <label for="net-total">Net Total (₹):</label>
+                            <input type="number" id="net-total" placeholder="0.00" disabled>
+                        </div>
+                        <div class="input-group-bill">
+                            <label for="cgst">CGST (%):</label>
+                            <input type="text" id="cgst" placeholder="CGST" disabled>
+                        </div>
+                        <div class="input-group-bill">
+                            <label for="sgst">SGST (%):</label>
+                            <input type="text" id="sgst" placeholder="SGST" disabled>
+                        </div>
+                        <div class="input-group-bill">
+                            <label for="net-amt">Net Amount (₹):</label>
+                            <input type="number" id="net-amt" placeholder="0.00" disabled>
+                        </div>
+                        <div class="input-group-bill customer_gst">
+                            <label for="customer_gst">Customer GST No:</label>
+                            <input type="text" id="customer_gst" placeholder="11XXXXX0000XX0XX ">
+                        </div>
+
+
+
+                    </div>
+
+                    <div class="button-groups">
+                        <button class="print-bill-btn" id="print-bill-btn">PRINT BILL</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="./../../session.js"></script>
+    <script src="./../../common.js"></script>
+    <script src="takeorder.js"></script>
+
+
+    <script>
+        document.addEventListener('keydown', function (event) {
+            if (event.ctrlKey && (event.key === '+' || event.key === '-' || event.key === '=')) {
+                event.preventDefault();
+            }
+        });
+
+        document.addEventListener('wheel', function (event) {
+            if (event.ctrlKey) {
+                event.preventDefault();
+            }
+        }, { passive: false });
+    </script>
+
+
+
+</body>
+
+</html>

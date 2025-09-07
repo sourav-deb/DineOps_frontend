@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <!-- <h1>Redirecting to Hotel Iswar page...</h1> -->
+    <script>
+        // add a script make a delay of 5 sec
+        document.addEventListener('DOMContentLoaded', function() {
+            // Show loading state or splash screen
+            document.body.style.opacity = '0';
+            
+            // Wait for 5 seconds
+            setTimeout(function() {
+                // Show content
+                document.body.style.opacity = '1';
+                document.body.style.transition = 'opacity 0.5s ease-in';
+            }, 5000);
+        });
+
+        
+        // forward to new url
+        window.location.href = "./login/login.html";
+    </script>
+</body>
+</html>

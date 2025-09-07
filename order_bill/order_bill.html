@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Bill</title>
+
+    <link rel="stylesheet" href="order_bill.css">
+</head>
+
+<body>
+    <!-- create a a4 size bill wrapper -->
+    <div class="bill-wrapper">
+        <div class="bill-container">
+            <header class="bill-header">
+                <div class="header-content">
+                    <div class="logo">
+                        <img src="logo.png" alt="Restaurant Logo" class="restaurant-logo">
+                        <!-- Replace with your logo path -->
+                    </div>
+                    <div class="restaurant-details">
+                        <h2>Hotel Iswar & Family Restaurant</h2>
+                        <p>Address: Central Road, Silchar, Assam, 788001</p>
+                        <p>Contact: +91 38423 19540 / +91 6003704064</p>
+                        <p>Website: www.hoteliswar.in</p>
+                        <p>GST No: 18BDXPS2451N1ZK</p>
+                    </div>
+                </div>
+            </header>
+
+            <section class="invoice-customer-info">
+                <div class="invoice-info">
+                    <h3>Invoice</h3>
+                    <div>Bill No: <span id="bill-number"> 1234</span></div>
+                    <div>Date: <span id="bill-date">02/11/2024</span></div>
+                    <div>Table: <span id="table-number"> 12</span></div>
+                    <div>Order Type: <span id="order-type"> </span></div>
+                </div>
+
+                <div class="bill-details">
+                    <h3>Customer Details</h3>
+                    <div>Name: <span id="customer-name"> Mr. X </span></div>
+                    <div>Email: <span id="customer-email"> xyz@gmail.com </span></div>
+                    <div>Phone: <span id="customer-phone"> 9876543210 </span></div>
+                    <div>GST No.: <span id="customer-gstno"> 1234567890 </span></div>
+                </div>
+            </section>
+
+            <section class="bill-items">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Item Name</th>
+                            <th>Quantity</th>
+                            <th>Rate</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bill-items-body">
+                        <!-- Items will be dynamically inserted here -->
+                        <!-- Sample Data -->
+                        <tr>
+                            <td>Item 1</td>
+                            <td>2</td>
+                            <td>100</td>
+                            <td>200</td>
+                        </tr>
+                        <tr>
+                            <td>Item 2</td>
+                            <td>1</td>
+                            <td>150</td>
+                            <td>150</td>
+                        </tr>
+                        <tr>
+                            <td>Item 3</td>
+                            <td>3</td>
+                            <td>200</td>
+                            <td>600</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                        </tr>
+
+                        <tr class="bill-total total"></tr>
+                        <td></td>
+                        <td>Total</td>
+                        <td></td>
+                        <td>950</td>
+                        </tr>
+                        <tr class="bill-total discount">
+                            <td></td>
+                            <td>Discount</td>
+                            <td></td>
+                            <td>350</td>
+                        </tr>
+                        <tr class="bill-total gst">
+                            <td></td>
+                            <td>Central GST</td>
+                            <td>2.50%</td>
+                            <td>50</td>
+                        </tr>
+                        <tr class="bill-total gst">
+                            <td></td>
+                            <td>Central GST</td>
+                            <td>2.50%</td>
+                            <td>50</td>
+                        </tr>
+                        <tr class="bill-total net-amount">
+                            <td></td>
+                            <td>Net Amount</td>
+                            <td class="inr-symbol">INR ₹</td>
+                            <td>700</td>
+                        </tr>
+                        <tr class="bill-total amount-in-words">
+                            <td> Amount in Words (INR) :</td>
+                            <td colspan="3"></td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </section>
+
+            
+
+
+            <footer class="bill-footer">
+                <div class="kot-section">
+                    <div class="kot-head">
+                        Kot Nos #
+                    </div>
+                    <div class="kot-nos">
+                        1234/01
+                    </div>
+                </div>
+
+                <div class="cashier-info">
+                    <div class="cashier-name">Cashier: </div>
+                    <div class="name"> MANAGER </div>
+                    <div class="cashier-date">02/11/2024 10:30:23 </div>
+                </div>
+
+                <div class="license-nos">
+                    <div class="fssai">FSSAI LICENSE NO: 1234567890</div>
+
+                </div>
+
+                <div class="bill-footer-text">
+                    * * * Thank you for Dining with us! * * *
+                </div>
+
+            </footer>
+
+        </div>
+    </div>
+</body>
+
+</html>

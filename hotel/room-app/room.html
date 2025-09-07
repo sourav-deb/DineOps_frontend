@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room</title>
+
+    <link rel="stylesheet" href="./room-app/room.css">
+    <!-- <link rel="stylesheet" href="room.css"> -->
+</head>
+
+<body>
+    <div class="header-wrap">
+        <div class="date-time">All Rooms</div>
+        <div class="header-buttons">
+            <!-- <button class="add-room-btn" id="openAddModal">Add Room</button> -->
+            <div class="add-room-btn" id="openAddModal">Add Room</div>
+            <!-- <button class="add-room-btn">+ Add Room</button> -->
+        </div>
+    </div>
+
+    <div class="room-list-card">
+        <!-- <div class="all-room-head">All Rooms</div> -->
+        <div class="room-list-table room-list-head">
+            <div class="col-2">Room Number</div>
+            <div class="col-2">Price</div>
+            <div class="col-2">Room Type</div>
+            <!-- <div class="col-2">Description</div> -->
+            <div class="col-3">Bed Type</div>
+            <div class="col-1">Actions</div>
+        </div>
+        <div class="append-all-room"></div>
+    </div>
+
+    <!-- Add Room Modal -->
+    <div class="modal-container">
+        <div id="roomModal" class="roomModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span class="close">&times;</span>
+                    <div class="model-content-title">Add Room</div>
+                </div>
+
+                <div class="add-room-form">
+                    <div class="input-element-image" style="display: none">
+                        <div id="imagePreview" class="image-preview"></div>
+                        <label for="roomImage">Add Room Images</label>
+                        <input type="file" class="roomImage" id="roomImage" name="roomImage" accept="image/*" multiple>
+                    </div>
+
+                    <div class="input-element">
+                        <label for="roomNumber">Room Number</label>
+                        <input type="text" id="roomNumber" name="roomNumber" placeholder="Room Number" required>
+                    </div>
+                    <div class="input-element">
+                        <label for="roomPrice">Room Price</label>
+                        <input type="text" id="roomPrice" name="roomPrice" placeholder="Room Price" required>
+                    </div>
+                    <div class="input-element">
+                        <label for="roomType">Room Type</label>
+                        <select id="roomType" name="roomType" required>
+                            <option value="" selected disabled>Select Room Type</option>
+                            <option value="deluxe">Deluxe AC</option>
+                            <option value="suite">Suite AC</option>
+                            <option value="standard">Standard AC</option>
+                            <option value="super-deluxe">Super Deluxe AC</option>
+                            <option value="standard-nonac">Standard Non AC</option>
+                        </select>
+                    </div>
+                    <div class="input-element">
+                        <label for="bedType">Bed Type</label>
+                        <select id="bedType" name="bedType" required>
+                            <option value="" selected disabled>Select Bed Type</option>
+                            <option value="double">Double Bed</option>
+                            <option value="double-separated">Double Bed (Separated)</option>
+                            <option value="king">King Size Bed (Front View)</option>
+                        </select>
+                    </div>
+
+                    <div class="input-element">
+                        <label for="roomStatus">Room Status</label>
+                        <select id="roomStatus" name="roomStatus" required>
+                            <option value="" selected disabled>Select Status</option>
+                            <option value="available">Available</option>
+                            <option value="cleaning">Cleaning</option>
+                            <option value="maintenance">Maintenance</option>
+                        </select>
+                    </div>
+
+                    <!-- Description Here -->
+                    <div class="input-element-desc">
+                        <!-- <label for="roomDescription">Room Amenities</label> -->
+                        <label>Room Amenities</label>
+                        <!-- <textarea id="roomDescription" name="roomDescription" placeholder="Room Description" required></textarea> -->
+                        <!-- Multiple Checkbox add as amenities -->
+                        <div class="amenities-container">
+                            <label><input type="checkbox" name="amenities" value="shower"> Shower</label>
+                            <label><input type="checkbox" name="amenities" value="sunlight"> Sunlight</label>
+                            <label><input type="checkbox" name="amenities" value="refrigerator"> Refrigerator</label>
+                            <label><input type="checkbox" name="amenities" value="air-conditioner"> Air Conditioner</label>
+                            <label><input type="checkbox" name="amenities" value="tv-cable"> TV Cable</label>
+                            <label><input type="checkbox" name="amenities" value="wifi"> WiFi</label>
+                            <label><input type="checkbox" name="amenities" value="smart-tv"> Smart TV</label>
+                        </div>
+                    </div>
+                    <!--  -->
+
+                    <div class="add-save-btn">
+                        <input type="button" class="add-room-save-btn" id="add-room-save-btn" value="Submit">
+                    </div>
+                </div>
+                <!-- <div class="modal-body"></div> -->
+            </div>
+        </div>
+    </div>
+
+
+    <!-- <script src="./../../common.js"></script> -->
+    <!-- <script src="room.js"></script> -->
+    <!-- <script src="./room-app/room.js"></script> -->
+</body>
+
+</html>

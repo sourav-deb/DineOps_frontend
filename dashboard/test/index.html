@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            /* height: 680px; */
+            /* height: 713px; */
+            width: 100%;
+            overflow: auto;
+            background-color: aqua;
+        }
+        .container{
+            width: 100%;
+            height: 20%;
+            /* overflow: auto; */
+            background-color: rgb(3, 25, 18);
+        }
+        .container2{
+            width: 100%;
+            height: 80%;
+            /* overflow: auto; */
+            background-color: rgb(167, 206, 194);
+        }
+
+        .nested-container{
+            height: 50%;
+            background-color: rgb(3, 25, 18);
+        }
+
+        .nested-container-child{
+            background-color: aliceblue;
+            height: 50%;
+        }
+
+        /* Screen height: 864px, Viewport height: 714px, Browser header height: 150px */
+    </style>
+</head>
+
+<body>
+    <!-- <div class="container"></div> -->
+    <!-- <div class="container2"></div> -->
+
+    <div class="nested-container">
+        <div class="nested-container-child"></div>
+    </div>
+
+    <script>
+        function getBrowserHeaderHeight() {
+            const screenHeight = window.screen.height; // Total screen height
+            const viewportHeight = window.innerHeight; // Viewport height (excluding browser UI)
+            const headerHeight = screenHeight - viewportHeight;
+            const string = `Screen height: ${screenHeight}px, Viewport height: ${viewportHeight}px, Browser header height: ${headerHeight}px`;
+            document.body.style.height = (viewportHeight-1 )+ 'px';
+
+            return string;
+        }
+
+        console.log(getBrowserHeaderHeight());
+    </script>
+</body>
+
+</html>

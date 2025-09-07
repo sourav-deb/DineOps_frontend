@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room</title>
+
+    <link rel="stylesheet" href="./billing-app/billing.css">
+    <!-- <link rel="stylesheet" href="room.css"> -->
+</head>
+
+<body>
+    <div class="header-wrap">
+        <!-- <div class="date-time">All Rooms</div> -->
+        <!-- <div class="header-buttons">
+            <div class="add-room-btn" id="openAddModal">Add Room</div>
+        </div> -->
+    </div>
+
+    <div class="room-list-card">
+        <div class="all-room-head">Hotel Billings
+            
+        </div>
+        <div class="room-list-table">
+            <div class="col-1">Billing Id</div>
+            <div class="col-1">Booking Id</div>
+            <div class="col-3">Guest Name</div>
+            <div class="col-2">Billed Amount</div>
+            <div class="col-2">Payment Status</div>
+            <div class="col-1">Actions</div>
+        </div>
+        <div class="append-all-room"></div>
+    </div>
+
+    <!-- View Bill Modal -->
+    <div class="modal-container">
+        <div id="roomModal" class="roomModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span class="close">&times;</span>
+                    <div class="model-content-title">Details</div>
+                </div>
+
+                <div class="modal-body">
+
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Payment Order-->
+    <div class="modal-container2">
+        <div id="paymentModal" class="payment-modal">
+            <div class="modal-content">
+                <div class="modal-head">
+                    <span class="close-payment">&times;</span>
+                    <div class="modal-title">COLLECT PAYMENT</div>
+                </div>
+                <div class="modal-body">
+                    <div class="generate-bill-form">
+
+                        <div class="input-group-bill">
+                            <label for="order-id">Bill No.</label>
+                            <input type="text" id="order-id" placeholder="Bill No." disabled>
+                        </div>
+
+                        <div class="input-group-bill">
+                            <label for="net-amt">Net Amount (₹):</label>
+                            <input type="number" id="net-amt" placeholder="0.00" disabled>
+                        </div>
+                        <div class="input-group-bill">
+                            <label for="paid-amt">Paid Amount (₹):</label>
+                            <input type="number" id="paid-amt" placeholder="0.00">
+                        </div>
+
+                        <label>Payment Method:</label>
+                        <div class="payment-method">
+                            <div class="pm-check pm-check-inline">
+                                <input class="form-check-input" type="radio" name="paymentMethod" id="cash"
+                                    value="cash">
+                                <label class="form-check-label" for="cash">Cash</label>
+                            </div>
+                            <div class="pm-check pm-check-inline">
+                                <input class="form-check-input" type="radio" name="paymentMethod" id="card"
+                                    value="card">
+                                <label class="form-check-label" for="card">Card</label>
+                            </div>
+                            <div class="pm-check pm-check-inline">
+                                <input class="form-check-input" type="radio" name="paymentMethod" id="upi" value="upi">
+                                <label class="form-check-label" for="upi">UPI</label>
+                            </div>
+                            <div class="pm-check pm-check-inline">
+                                <input class="form-check-input" type="radio" name="paymentMethod" id="due" value="due">
+                                <label class="form-check-label" for="due">Due</label>
+                            </div>
+                            <div class="pm-check pm-check-inline">
+                                <input class="form-check-input" type="radio" name="paymentMethod" id="other"
+                                    value="other">
+                                <label class="form-check-label" for="other">Other</label>
+                            </div>
+                        </div>
+
+
+
+
+                        <div class="input-group-bill customer_gst">
+                            <label for="payment-message">Message:</label>
+                            <input type="text" id="payment-message" placeholder="Info about payment">
+                        </div>
+
+
+
+                    </div>
+
+                    <div class="button-groups">
+                        <button class="print-bill-btn" id="payment-btn">COLLECT PAYMENT</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- <script src="./../../common.js"></script> -->
+    <!-- <script src="room.js"></script> -->
+    <!-- <script src="./room-app/room.js"></script> -->
+</body>
+
+</html>

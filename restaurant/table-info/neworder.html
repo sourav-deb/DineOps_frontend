@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Table Reservation</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Free Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="table-style.css">
+</head>
+
+<body>
+    <div class="header">
+        <!-- logo -->
+        <img src="./../../assets/image/logo.png" alt="Hotel Iswar Logo" class="logo">
+        <div class="header-title">Hotel Iswar</div>
+        <div class="header-items">
+            <ul>
+                <li><a href="./../table-info/neworder.html">New Order</a></li>
+                <!-- <li class="support">Call For Support <br> 7002246506</li> -->
+                <li><a href="./../../dashboard/dashboard.html">Dashboard</a></li>
+                <li><a href="./../../hotel/hotel.html">Hotel</a></li>
+                <li id="logout">Logout</li>
+            </ul>
+        </div>
+    </div>
+
+
+    <div class="table-view">
+        <div class="table-view-head">Table View
+            
+            <div class="order-type-info">
+                <button class="refresh" id="refresh">↻ REFRESH</button>
+                <button class="type-selectable" id="delivery">DELIVERY</button>
+                <button class="type-selectable" id="take_away">TAKEAWAY</button>
+            </div>
+            <div class="order-indicator">
+                <div class="indicator">
+                    <div class="indicator-color" id="blank"></div>
+                    <div class="indicator-text">Blank Table</div>
+                </div>
+                <div class="indicator">
+                    <div class="indicator-color" id="order"></div>
+                    <div class="indicator-text">Order Running</div>
+                </div>
+            </div>
+        </div>
+        <div class="table-view-body">
+            <div class="table-view-row">
+                <div class="row-caption">Ground Floor</div>
+                <!-- <div class="table-view-cell">
+                    <div class="text">
+                        <div id="order-min"></div>
+                        <div id="table-no">1</div>
+                        <div id="amount"></div>
+                    </div>
+                </div>-->
+            </div>
+            <div class="room-view-row" style="display:none;">
+                <div class="row-caption">Room Service</div>
+                <!-- <div class="room-view-cell">
+                    <div class="text">
+                        <div id="order-min"></div>
+                        <div id="room-no">101</div>
+                        <div id="amount"></div>
+                    </div>
+                </div> -->
+
+            </div>
+
+            <div class="delivery-view-row">
+                <!-- <div class="row-caption" id="delivery-row">Delivery</div> -->
+                <!-- <div class="delivery-view-cell">
+                    <div class="text">
+                        <div id="order-min"></div>
+                        <div id="room-no"></div>
+                        <div id="amount"></div>
+                    </div>
+                </div> -->
+            </div>
+            <div class="pickup-view-row">
+                <!-- <div class="row-caption" id="pickup-row">Pickup</div> -->
+            </div>
+        </div>
+    </div>
+
+    <script src="./../../session.js"></script>
+    <script src="./../../common.js"></script>
+    <script src="table-script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Categories</title>
+    <link rel="stylesheet" href="./menu-management/categories/categories.css">
+</head>
+
+<body>
+    <div class="new-item-card">
+        <div class="new-item-card-title">Add New Category</div>
+        <div class="new-item-card-body">
+            <div class="new-item-card-body-item">
+                <div class="new-item-card-body-item-label">Category
+                    Name</div>
+                <input type="text" class="new-item-card-body-item-input" id="catgName">
+            </div>
+            <div class="new-item-card-body-item">
+                <div class="new-item-card-body-item-label">Category
+                    Description</div>
+                <textarea class="new-item-card-body-item-input" rows="1" id="catgDescription"></textarea>
+            </div>
+            <div class="new-item-card-body-item">
+                <div class="new-item-card-body-item-label">Category
+                    Status</div>
+                <!-- <input type="text" class="new-item-card-body-item-input"> -->
+                <label class="switch">
+                    <input type="checkbox" id="catgStatus" class="new-item-card-body-item-input" id="catgStatus" onchange="updateCatgStatus(this)">
+                    <span class="slider round"></span>
+                </label>
+                <span id="statusText">Disabled</span>
+            </div>
+            <div class="new-item-card-body-item">
+                <div class="new-item-card-body-item-label">Category
+                    Image</div>
+                <input type="file" class="new-item-card-body-item-input" id="catgImg">
+            </div>
+            <div class="new-item-card-body-item">
+                <button class="new-item-card-body-item-button" id="add-category">Add Category</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="all-items-list">
+        <div class="all-items-list-title">All Categories
+            <div class="refresh-btn" id="refresh-btn" >
+                <i class="fas fa-sync-alt "></i>
+            </div>
+        </div>
+        <div class="all-list-table-head">
+            <div class="col-2">Name</div>
+            <div class="col-3">Description</div>
+            <div class="col-3">Status</div>
+            <div class="col-2">Image</div>
+            <div class="col-2">Actions</div>
+        </div>
+        <div class="all-list-table-items">
+            <!-- List items inserted -->
+        </div>
+    </div>
+
+    <!--  Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Edit Category</h2>
+            <form id="editForm">
+                <div class="modal-body-item">
+                    <!-- <div class="new-item-card-body-item-label">Item Name</div> -->
+                    <input type="text" class="modal-input" placeholder="Catgeory Name" id="editCatgName">
+                </div>
+                
+                <div class="modal-body-item">
+                    <!-- <div class="new-item-card-body-item-label">Item Description</div> -->
+                    <textarea class="modal-input" rows="1" placeholder="Description" id="editCatgDescription"></textarea>
+                </div>
+                <div class="modal-body-item">
+                    <!-- <div class="new-item-card-body-item-label">Item Price</div> -->
+                    <!-- <input type="text" class="modal-input" placeholder="status" id="editStatus"> -->
+                    <label class="switch">
+                        <input type="checkbox" id="editCatgStatus" class="new-item-card-body-item-input" onchange="updateCatgModalStatus(this)">
+                        <span class="slider round"></span>
+                    </label>
+                    <span id="statusModalText">Disabled</span>
+
+                </div>
+                <div class="modal-body-item">
+                    <!-- <div class="new-item-card-body-item-label">Item Image</div> -->
+                    <input type="file" class="modal-input" id="editCatgImg">
+                </div>
+                <div class="modal-body-item">
+                    <button class="new-item-card-body-item-button" id="update-category">Update Category</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- End Modal  -->
+
+    <!-- <script src="./menu-management/categories/categories.js"></script> -->
+</body>
+
+</html>

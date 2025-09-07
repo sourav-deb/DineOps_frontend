@@ -1,0 +1,241 @@
+.blank-page {
+    display: flex; 
+    flex-direction: column; 
+    justify-content: space-between; 
+    width: 209mm; 
+    min-height: 297mm; 
+    padding: 10px; 
+    border: 0px solid #000; 
+    font-family: Arial, sans-serif; 
+    background-color: #fff; 
+    position: relative;
+}
+
+.bill-wrapper {
+    display: flex; 
+    flex-direction: column; 
+    justify-content: space-between; 
+    width: 209mm; 
+    min-height: 297mm; 
+    padding: 10px; 
+    border: 1px solid #000; 
+    font-family: Arial, sans-serif; 
+    background-color: #fff; 
+    position: relative;
+}
+
+@media print {
+    .blank-page {
+        height: 50vh;
+        page-break-after: always;
+        break-after: page;
+    }
+
+    .bill-wrapper {
+        page-break-before: always;
+        break-before: page;
+    }
+}
+
+@page {
+    size: A4;
+    /* margin: 0; */
+}
+/* @media print {
+    body {
+        margin: 0;
+        padding: 0;
+    }
+} */
+
+/* body{
+    scale: 0.94;
+} 
+
+.bill-wrapper {
+    display: flex; 
+    flex-direction: column; 
+    justify-content: space-between; 
+    width: 148mm; 
+    min-height: 210mm; 
+    padding: 10px; 
+    border: 1px solid #000; 
+    font-family: Arial, sans-serif; 
+    background-color: #fff; 
+    position: relative;
+     scale: 0.5; 
+} */
+
+
+
+
+
+.page-border{
+    border: 2px solid #000; 
+    padding: 2mm; 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: space-between; 
+}
+
+.bill-header{
+    text-align: center; 
+}
+
+.bill-header{
+    border-bottom: 2px solid #000; 
+}
+
+.bill-items {
+    margin: 20px 0; 
+}
+
+.bill-items table {
+    width: 100%; 
+    border-collapse: collapse; 
+}
+
+.bill-items th, .bill-items td {
+    border: 0px solid #000; 
+    padding: 3px; 
+    text-align: left; 
+}
+
+.bill-items th {
+    background-color: #f2f2f2; 
+}
+
+/* Header styles */
+.bill-header {
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+}
+
+.header-content {
+    display: flex; 
+    width: 100%; 
+}
+
+.logo {
+    flex: 1; 
+}
+
+.restaurant-logo {
+    width: 200px; 
+    height: 160px; 
+}
+
+.restaurant-details {
+    flex: 2; 
+    text-align: right; 
+}
+
+.restaurant-details h2 {
+    margin-bottom: 5px; 
+}
+
+.restaurant-details p {
+    margin: 5px 0; 
+    line-height: 1.2; 
+}
+
+.invoice-info {
+    flex: 1; 
+    text-align: left; 
+}
+
+.invoice-info h1 {
+    margin: 0; 
+}
+
+.invoice-customer-info {
+    display: flex; 
+    justify-content: space-between; 
+    border-bottom: 1px solid #000;
+}
+
+.bill-details {
+    flex: 1; 
+    text-align: left; 
+}
+
+.invoice-info div,
+.bill-details div {
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+.bill-total.amount-in-words{
+    font-weight: bold; 
+
+}
+
+.bill-total.total,
+.bill-total.net-amount{
+    font-weight: bold; 
+}
+
+.bill-total.net-amount{
+    font-size: 1.2em; 
+}
+
+.kot-head, .kot-nos{
+    display: inline-block; 
+}
+
+.bill-footer {
+    border-top: 2px solid #000;
+    padding-top: 3px;
+    position: absolute;
+    bottom: 0;
+    width: 98%;
+    margin-top: auto; 
+    /* text-align: center;  */
+}
+
+.bill-footer-text{
+    font-weight: bold;
+    font-size: 1.2em; 
+    text-align: center; 
+}
+
+.cashier-info{
+    display: flex; 
+    justify-content: space-between; 
+    padding-top: 10px;
+    padding-bottom: 30px;
+}
+
+.cashier-name, .name, .cashier-date{
+    display: inline-block; 
+}
+
+.name{
+    padding-left: 20px;
+    text-transform: uppercase; 
+}
+
+.cashier-date{
+    margin-right: 10mm;
+    font-weight: bold; 
+    text-align: right; 
+    flex: 1; 
+}
+
+.license-nos{
+    display: flex; 
+    justify-content: space-between; 
+    font-weight: bold; 
+    padding-bottom: 20px;
+}
+
+/* table tr {
+    height: 1px !important; 
+} */
+
+
+h3{
+    margin-top: 4px;
+    margin-bottom: 2px;
+}

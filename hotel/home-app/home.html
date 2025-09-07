@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Iswar - Home</title>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="./home-app/home.css">
+</head>
+<body>
+    <div class="home-container">
+        <div class="welcome-section">
+            <h1>Welcome to Hotel Iswar Dashboard</h1>
+            <p>Manage your hotel operations efficiently</p>
+        </div>
+        
+        <div class="stats-container">
+            <div class="stat-card">
+                <i class="fas fa-bed stat-icon"></i>
+                <div class="stat-value" id="availableRooms">0</div>
+                <div class="stat-label">Available Rooms</div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-users stat-icon"></i>
+                <div class="stat-value" id="currentGuests">-</div>
+                <div class="stat-label">Current Guests</div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-calendar-check stat-icon"></i>
+                <div class="stat-value" id="todayBookings">-</div>
+                <div class="stat-label">Today's Bookings</div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-utensils stat-icon"></i>
+                <div class="stat-value" id="activeOrders">-</div>
+                <div class="stat-label">Active Orders</div>
+            </div>
+        </div>
+
+        <div class="quick-actions">
+            <div class="action-card" onclick="window.location.href='./../restaurant/table-info/neworder.html'">
+                <i class="fas fa-plus-circle action-icon"></i>
+                <div class="action-title">New Order</div>
+                <div class="action-description">Create a new food order</div>
+            </div>
+            <div class="action-card" onclick="document.getElementById('booking').click()">
+                <i class="fas fa-book action-icon"></i>
+                <div class="action-title">Room Booking</div>
+                <div class="action-description">Manage room bookings</div>
+            </div>
+            <div class="action-card" onclick="document.getElementById('hotel-bill').click()">
+                <i class="fas fa-file-invoice action-icon"></i>
+                <div class="action-title">Billing</div>
+                <div class="action-description">View and manage bills</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <!-- <script src="./../../common.js"></script>
+    <script src="./home-app/home.js"></script> -->
+</body>
+</html>

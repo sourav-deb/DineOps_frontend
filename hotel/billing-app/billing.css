@@ -1,0 +1,472 @@
+.header-wrap {
+    margin: 10px;
+}
+
+.date-time {
+    display: inline;
+    font-size: 1.5em;
+}
+
+.header-buttons {
+    display: inline;
+}
+
+.add-room-btn {
+    display: inline;
+    float: right;
+    border: 0px;
+    background-color: rgb(255, 197, 49);
+    padding: 7px 20px 7px 20px;
+    border-radius: 4px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.room-list-card {
+    background-color: rgb(254, 226, 190);
+    margin: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    padding-bottom: 200px;
+    height: 90vh;
+    overflow-y: auto;
+}
+
+.room-list-card::-webkit-scrollbar {
+    width: 8px;
+}
+
+.room-list-card::-webkit-scrollbar-track {
+    background-color: #f1f1f1;
+}
+
+.room-list-card::-webkit-scrollbar-thumb {
+    background-color: rgb(165, 154, 154);
+    border-radius: 5px;
+}
+
+.room-list-card::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(165, 154, 154);
+}
+
+.all-room-head {
+    border-bottom: 2px solid rgb(54, 54, 54);
+    font-size: 1.3em;
+}
+
+.room-list-table {
+    padding-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    font-weight: 600;
+}
+
+.room-row{
+    margin-top: 12px;
+    margin-bottom: 12px;
+    font-weight: 500;
+}
+
+.view-room-eye{
+    cursor: pointer;
+    color: rgb(255, 140, 0);
+}
+
+.roomData-list {
+    padding-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+/*  */
+
+.col-1 {
+    flex: 0 0 8.333333%;
+}
+
+.col-2 {
+    flex: 0 0 16.666667%;
+}
+
+.col-3 {
+    flex: 0 0 25%;
+}
+
+.col-4 {
+    flex: 0 0 33.333333%;
+}
+
+.col-6 {
+    flex: 0 0 50%;
+}
+
+.col-12 {
+    flex: 0 0 100%;
+}
+
+/*  */
+
+.modal-container {
+    position: fixed !important;
+    z-index: 10000;
+    right: -100%;
+    top: 0;
+    width: 100%;
+    /* max-width: 400px;  */
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.2);
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+    transition: right 0.3s ease-out;
+}
+
+.roomModal {
+    position: fixed !important;
+    z-index: 10000;
+    right: -100%;
+    top: 0;
+    width: 100%;
+    max-width: 45%;
+    height: 100%;
+    background-color: rgb(255, 255, 255);
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+    transition: right 0.3s ease-out;
+}
+
+.roomModal.show {
+    right: 0 !important;
+    /* position: relative; */
+}
+
+.roomModal-content {
+    height: 100%;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.modal-content{
+    height: 100%;
+    overflow-y: auto;
+}
+
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background-color: #f1f1f1;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background-color: rgb(165, 154, 154);
+    border-radius: 5px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(165, 154, 154);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.model-content-title {
+    flex-grow: 1;
+    text-align: center;
+    font-size: 1.5em;
+    font-weight: 600;
+}
+
+.close {
+    font-size: 28px;
+    cursor: pointer;
+}
+
+.modal-body{
+    padding-left: 20px;
+}
+
+.booking-modal-data .booking-data-head,
+.booking-data-head{
+    display: inline-block;
+    color: #000000;
+    width: 200px;
+    font-weight: 600;
+}
+
+
+/*  */
+
+.modal-container2 {
+    position: fixed;
+    z-index: 10000;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #00000080; /* Darker overlay */
+    display: none; /* Hidden by default */
+    justify-content: center;
+    align-items: center;
+}
+
+.payment-modal {
+    position: relative;
+    z-index: 1000;
+    min-width: 500px;
+    min-height: 520px;
+    max-width: 500px;
+    max-height: 520px;
+    background-color: #fff;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    transition: transform 0.1s ease-out;
+    border-radius: 5px;
+}
+
+.payment-modal.show {
+    transform: translateX(0);
+}
+
+.modal-content {
+    height: 100%;
+    overflow-y: auto;
+    padding: 20px;
+    display: inline-block;
+}
+
+.modal-content::-webkit-scrollbar {
+    width: 5px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: #888;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Modal Header */
+.modal-head {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #434343;
+}
+
+.close-payment {
+    top: 10px;
+    right: 20px;
+    font-size: 28px;
+    cursor: pointer;
+}
+
+.modal-title {
+    font-size: 1em;
+    font-weight: 600;
+    margin-bottom: 20px;
+    flex-grow: 1;
+    text-align: center;
+    padding-top: 10px;
+}
+
+/* Modal Body */
+.modal-body {
+    padding-top: 10px;
+    overflow-y: hidden;
+}
+
+
+/* Form Elements */
+.generate-bill-form label {
+    font-size: 0.9em;
+    font-weight: 500;
+    min-width: 60%;
+}
+
+.generate-bill-form input {
+    width: 3%;
+    border: 0px solid #fcb00b !important;
+    border-radius: 3px;
+    text-align: right;
+}
+
+.input-group-bill {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.input-group-bill input {
+    width: 150px !important;
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    color: #000;
+}
+
+/* Specific Input Styling */
+#paid-amt, #payment-message {
+    border: 2px solid #fcb00b !important;
+    border-radius: 3px;
+}
+
+.customer_gst label {
+    min-width: 40% !important;
+}
+
+.customer_gst input {
+    min-width: 245px !important;
+}
+
+/* Remove number input spinners */
+.generate-bill-form input[type="number"]::-webkit-inner-spin-button,
+.generate-bill-form input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.generate-bill-form input[type="number"] {
+    -moz-appearance: textfield; /* Firefox */
+}
+
+/* Print Button */
+.print-bill-btn,
+.view-bill-btn,
+.pay-bill-btn {
+    background-color: #e2a600;
+    border: 0px;
+    border-radius: 3px;
+    font-size: 1em;
+    font-weight: 500;
+    padding: 10px 15px;
+}
+
+/* Button Groups */
+.button-groups {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+/* Payment Method */
+
+/* Payment Method Container */
+.payment-method {
+    text-align: center;
+    /* background-color: #eaeaea; */
+    padding: 10px;
+    border-radius: 50px;
+    margin: 10px 0;
+}
+
+/* Payment Method Check Container */
+.pm-check {
+    display: inline-block;
+    margin: 0 10px;
+}
+
+.form-check-input{
+background-color: #adadad;
+}
+
+
+/* Radio Button Styling */
+.form-check-input[type="radio"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #ffaf02;
+    accent-color: #ffaf02;
+    border-radius: 50%;
+    margin-right: 5px;
+    vertical-align: middle;
+    position: relative;
+    cursor: pointer;
+}
+
+/* Radio Button Selected State */
+.form-check-input[type="radio"]:checked {
+    background-color: #ffaf02;
+    border-color: #ffaf02;
+}
+
+/* Radio Button Selected Dot */
+.form-check-input[type="radio"]:checked::after {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background-color: rgb(73, 73, 73);
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* Label Styling */
+.form-check-label {
+    font-size: 0.9rem;
+    color: #333;
+    cursor: pointer;
+    vertical-align: middle;
+}
+
+/* Hover Effects
+.form-check-input[type="radio"]:hover + .form-check-label {
+    color: #ffaf02;
+} */
+
+/* Media Query Adjustments */
+@media screen and (min-height: 700px) {
+    .form-check-label {
+        font-size: 1.1rem;
+        font-weight: 500;
+    }
+}
+
+/* spinnner */
+.all-room-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+}
+
+.refresh-btn {
+    background: none;
+    border: none;
+    color: #000000;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.refresh-btn:hover {
+    background-color: rgba(255, 175, 2, 0.1);
+    transform: rotate(180deg);
+}
+
+.refresh-btn i {
+    font-size: 1.2em;
+}
+
+/* Animation for refresh action */
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.refresh-btn.spinning i {
+    animation: spin 1s linear;
+}

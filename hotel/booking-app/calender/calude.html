@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room Booking Calendar</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .calendar-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: auto repeat(7, 1fr);
+            gap: 5px;
+        }
+        .calendar-cell {
+            border: 1px solid #ccc;
+            padding: 5px;
+            min-height: 100px;
+        }
+        .time-slot {
+            font-size: 12px;
+            border-bottom: 1px solid #eee;
+            padding: 2px 0;
+        }
+        .booking {
+            background-color: #e6f3ff;
+            border-radius: 3px;
+            padding: 2px;
+            margin: 1px 0;
+            font-size: 11px;
+        }
+    </style>
+</head>
+<body>
+    <div class="calendar-container">
+        <div class="calendar-header">
+            <button id="prevWeek">Previous Week</button>
+            <select id="monthSelect"></select>
+            <button id="nextWeek">Next Week</button>
+        </div>
+        <div id="calendar" class="calendar-grid"></div>
+    </div>
+
+    <script>
+        const calendar = document.getElementById('calendar');
+        const monthSelect = document.getElementById('monthSelect');
+        const prevWeekBtn = document.getElementById('prevWeek');
+        const nextWeekBtn = document.getElementById('nextWeek');
+
+        let currentDate = new Date();
+        currentDate.setHours(12, 0, 0, 0);  // Set to noon
+
+        const months = [
+            'January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'
+        ];
+
+        // Populate month select
+        months.forEach((month, index) => {
+            const option = document.createElement('option');
+            option.value = index;
+            option.textContent = month;
+            monthSelect.appendChild(option);
+        });
+
+        // Sample booking data
+        const bookings = [
+            { guestName: 'John Doe', checkinTime: new Date(2024, 7, 1, 14, 0), checkoutTime: new Date(2024, 7, 3, 11, 0) },
+            { guestName: 'Jane Smith', checkinTime: new Date(2024, 7, 4, 15, 0), checkoutTime: new Date(2024, 7, 6, 10, 0) },
+        ];
+
+        function renderCalendar() {
+            calendar.innerHTML = '';
+            const startOfWeek = new Date(currentDate);
+            startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
+
+            // Add time slots
+            for (let i = 0; i < 24; i++) {
+                const timeCell = document.createElement('div');
+                timeCell.className = 'calendar-cell';
+                timeCell.textContent = `${i === 0 ? '12 PM' : i < 12 ? i + ' AM' : i === 12 ? '12 PM' : (i - 12) + ' PM'}`;
+                calendar.appendChild(timeCell);
+            }
+
+            // Add days and bookings
+            for (let i = 0; i < 7; i++) {
+                const dayDate = new Date(startOfWeek);
+                dayDate.setDate(startOfWeek.getDate() + i);
+
+                const dayHeader = document.createElement('div');
+                dayHeader.className = 'calendar-cell';
+                dayHeader.textContent = `${dayDate.getDate()}/${dayDate.getMonth() + 1}`;
+                calendar.appendChild(dayHeader);
+
+                for (let hour = 0; hour < 24; hour++) {
+                    const hourCell = document.createElement('div');
+                    hourCell.className = 'calendar-cell';
+                    
+                    const cellTime = new Date(dayDate);
+                    cellTime.setHours(hour, 0, 0, 0);
+
+                    bookings.forEach(booking => {
+                        if (cellTime >= booking.checkinTime && cellTime < booking.checkoutTime) {
+                            const bookingElem = document.createElement('div');
+                            bookingElem.className = 'booking';
+                            bookingElem.textContent = booking.guestName;
+                            hourCell.appendChild(bookingElem);
+                        }
+                    });
+
+                    calendar.appendChild(hourCell);
+                }
+            }
+
+            monthSelect.value = currentDate.getMonth();
+        }
+
+        monthSelect.addEventListener('change', (e) => {
+            currentDate.setMonth(parseInt(e.target.value));
+            renderCalendar();
+        });
+
+        prevWeekBtn.addEventListener('click', () => {
+            currentDate.setDate(currentDate.getDate() - 7);
+            renderCalendar();
+        });
+
+        nextWeekBtn.addEventListener('click', () => {
+            currentDate.setDate(currentDate.getDate() + 7);
+            renderCalendar();
+        });
+
+        renderCalendar();
+    </script>
+</body>
+</html>

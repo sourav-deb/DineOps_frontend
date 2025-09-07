@@ -1,0 +1,262 @@
+[
+    {
+        "id": 1,
+        "tenant": 1,
+        "name": "BREAKFAST",
+        "description": "",
+        "image": "",
+        "status": "enabled",
+        "created_at": "2024-11-14T12:49:21.516347Z",
+        "modified_at": []
+    },
+    {
+        "id": 2,
+        "tenant": 1,
+        "name": "SOUTH INDIAN",
+        "description": "",
+        "image": "",
+        "status": "enabled",
+        "created_at": "2024-11-14T12:49:43.657322Z",
+        "modified_at": []
+    },
+    {
+        "id": 3,
+        "tenant": 1,
+        "name": "INDIAN NON-VEG",
+        "description": "",
+        "image": "",
+        "status": "enabled",
+        "created_at": "2024-11-14T12:50:14.020936Z",
+        "modified_at": []
+    },
+    {
+        "id": 4,
+        "tenant": 1,
+        "name": "INDIAN VEG",
+        "description": "",
+        "image": "",
+        "status": "enabled",
+        "created_at": "2024-11-14T12:50:29.106125Z",
+        "modified_at": []
+    },
+    {
+        "id": 5,
+        "tenant": 1,
+        "name": "MOMOS",
+        "description": "",
+        "image": "",
+        "status": "enabled",
+        "created_at": "2024-11-14T12:50:51.771710Z",
+        "modified_at": []
+    },
+    {
+        "id": 6,
+        "tenant": 1,
+        "name": "ROLL",
+        "description": "",
+        "image": "",
+        "status": "enabled",
+        "created_at": "2024-11-14T12:51:02.835926Z",
+        "modified_at": []
+    },
+    {
+        "id": 7,
+        "tenant": 1,
+        "name": "APPETIZER TANDOOR - VEG",
+        "description": "",
+        "image": "",
+        "status": "enabled",
+        "created_at": "2024-11-14T12:51:39.570783Z",
+        "modified_at": []
+    },
+    {
+        "id": 8,
+        "tenant": 1,
+        "name": "APPETIZER TANDOOR NON-VEG",
+        "description": "",
+        "image": "",
+        "status": "enabled",
+        "created_at": "2024-11-14T12:52:04.217474Z",
+        "modified_at": []
+    },
+    {
+        "id": 9,
+        "tenant": 1,
+        "name": "HAKKA NOODLES",
+        "description": "",
+        "image": "",
+        "status": "enabled",
+        "created_at": "2024-11-14T12:52:22.731812Z",
+        "modified_at": []
+    },
+    {
+        "id": 10,
+        "tenant": 1,
+        "name": "PIZZA",
+        "description": "",
+        "image": "",
+        "status": "enabled",
+        "created_at": "2024-11-14T12:52:36.236036Z",
+        "modified_at": []
+    },
+    {
+        "id": 11,
+        "tenant": 1,
+        "name": "SOUP",
+        "description": "",
+        "image": "",
+        "status": "enabled",
+        "created_at": "2024-11-14T12:53:15.617774Z",
+        "modified_at": []
+    },
+    {
+        "id": 12,
+        "tenant": 1,
+        "name": "CHINESE",
+        "description": "",
+        "image": "",
+        "status": "enabled",
+        "created_at": "2024-11-14T12:53:30.351425Z",
+        "modified_at": []
+    },
+    {
+        "id": 13,
+        "tenant": 1,
+        "name": "RICE",
+        "description": "",
+        "image": "",
+        "status": "enabled",
+        "created_at": "2024-11-14T12:53:42.790555Z",
+        "modified_at": []
+    },
+    {
+        "id": 14,
+        "tenant": 1,
+        "name": "MILKSHAKES",
+        "description": "",
+        "image": "",
+        "status": "enabled",
+        "created_at": "2024-11-14T12:58:07.876804Z",
+        "modified_at": []
+    },
+    {
+        "id": 15,
+        "tenant": 1,
+        "name": "COLD BEVERAGES",
+        "description": "",
+        "image": "",
+        "status": "enabled",
+        "created_at": "2024-11-14T13:06:52.736453Z",
+        "modified_at": []
+    },
+    {
+        "id": 16,
+        "tenant": 1,
+        "name": "SOFT DRINKS",
+        "description": "",
+        "image": [],
+        "status": "enabled",
+        "created_at": "2024-11-14T13:41:45.534784Z",
+        "modified_at": []
+    },
+    {
+        "id": 17,
+        "tenant": 1,
+        "name": "MOCKTAIL",
+        "description": "",
+        "image": "",
+        "status": "enabled",
+        "created_at": "2024-11-14T16:32:18.130543Z",
+        "modified_at": []
+    },
+    {
+        "id": 18,
+        "tenant": 1,
+        "name": "HOT BEVERAGES",
+        "description": "",
+        "image": "",
+        "status": "enabled",
+        "created_at": "2024-11-15T05:21:47.117784Z",
+        "modified_at": []
+    },
+    {
+        "id": 19,
+        "tenant": 1,
+        "name": "STARTER",
+        "description": "",
+        "image": "",
+        "status": "enabled",
+        "created_at": "2024-11-15T05:23:09.551847Z",
+        "modified_at": []
+    },
+    {
+        "id": 20,
+        "tenant": 1,
+        "name": "BIRIYANI",
+        "description": "",
+        "image": "",
+        "status": "enabled",
+        "created_at": "2024-11-15T05:24:28.944011Z",
+        "modified_at": []
+    },
+    {
+        "id": 21,
+        "tenant": 1,
+        "name": "INDIAN BREAD",
+        "description": "",
+        "image": "",
+        "status": "enabled",
+        "created_at": "2024-11-15T05:35:15.733433Z",
+        "modified_at": []
+    },
+    {
+        "id": 22,
+        "tenant": 1,
+        "name": "DAL",
+        "description": "",
+        "image": "",
+        "status": "enabled",
+        "created_at": "2024-11-15T05:36:06.085587Z",
+        "modified_at": []
+    },
+    {
+        "id": 23,
+        "tenant": 1,
+        "name": "PAPAD",
+        "description": "",
+        "image": "",
+        "status": "enabled",
+        "created_at": "2024-11-15T05:36:19.627702Z",
+        "modified_at": []
+    },
+    {
+        "id": 24,
+        "tenant": 1,
+        "name": "SALAD",
+        "description": "",
+        "image": "",
+        "status": "enabled",
+        "created_at": "2024-11-15T05:36:37.322491Z",
+        "modified_at": []
+    },
+    {
+        "id": 25,
+        "tenant": 1,
+        "name": "DESERT",
+        "description": "",
+        "image": "",
+        "status": "enabled",
+        "created_at": "2024-11-15T05:37:54.401287Z",
+        "modified_at": []
+    },
+    {
+        "id": 26,
+        "tenant": 1,
+        "name": "PACKAGED DRINKING WATER",
+        "description": "",
+        "image": "",
+        "status": "enabled",
+        "created_at": "2024-11-15T05:38:06.913120Z",
+        "modified_at": []
+    }
+]

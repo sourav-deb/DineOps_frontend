@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Services</title>
+    <link rel="stylesheet" href="./service-management/services/services.css">
+</head>
+
+<body>
+
+    <!-- Add New Item Card -->
+    <div class="new-item-card">
+        <div class="new-item-card-title">Add New Services</div>
+        <div class="new-item-card-body">
+            <div class="new-item-card-body-item">
+                <div class="new-item-card-body-item-label">Service Name</div>
+                <input type="text" class="new-item-card-body-item-input" id="new-item-name">
+            </div>
+            <div class="new-item-card-body-item">
+                <div class="new-item-card-body-item-label">Service Price</div>
+                <input type="text" class="new-item-card-body-item-input" id="new-item-price">
+            </div>
+            <div class="new-item-card-body-item">
+                <div class="new-item-card-body-item-label">Service Category</div>
+                <select class="new-item-card-body-item-input" id="new-item-catg">
+                    <option selected disabled>Choose category</option>
+                    
+                </select>
+            </div>
+            <div class="new-item-card-body-item">
+                <div class="new-item-card-body-item-label">Service Description</div>
+                <textarea class="new-item-card-body-item-input" id="new-item-desc" rows="1"></textarea>
+            </div>
+           
+
+            <div class="new-item-card-body-item">
+                <div class="new-item-card-body-item-label">Service Status</div>
+                <label class="switch">
+                    <input type="checkbox" id="itemStatus" class="new-item-card-body-item-input" onchange="updateStatus(this)">
+                    <span class="slider round"></span>
+                </label>
+                <span id="statusText">False</span>
+            </div>
+            
+            <div class="new-item-card-body-item">
+                <button class="new-item-card-body-item-button" id="add-item" type="button">Add Item</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- All Items List -->
+    <div class="all-items-list">
+        <div class="all-items-list-title">All Services
+            <div class="refresh-btn" id="refresh-btn">
+                <i class="fas fa-sync-alt "></i>
+            </div>
+        </div>
+        <div class="all-list-table-head">
+            <div class="col-2">Name</div>
+            <div class="col-1">Price</div>
+            <div class="col-2">Category</div>
+            <div class="col-2">Description</div>
+            <div class="col-2">Status</div>
+            <div class="col-1">Actions</div>
+        </div>
+        <div class="all-list-table-items">
+            <!-- List items inserted -->
+        </div>
+    </div>
+
+    <!--  Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Edit Item</h2>
+            <form id="editForm">
+                <div class="modal-body-item">
+                    <!-- <div class="new-item-card-body-item-label">Item Name</div> -->
+                    <input type="text" class="modal-input" placeholder="Item Name" id="editName">
+                </div>
+                <div class="modal-body-item">
+                    <!-- <div class="new-item-card-body-item-label">Item Price</div> -->
+                    <input type="text" class="modal-input" placeholder="Item Price" id="editPrice">
+                </div>
+                <div class="modal-body-item">
+                    <!-- <div class="new-item-card-body-item-label">Item Category</div> -->
+                    <select class="modal-input" id="editCategory">
+                        <option selected disabled>Choose category</option>
+                        
+                    </select>
+                </div>
+                <div class="modal-body-item">
+                    <!-- <div class="new-item-card-body-item-label">Item Description</div> -->
+                    <textarea class="modal-input" rows="1" placeholder="Description" id="editDescription"></textarea>
+                </div>
+                
+                <div class="modal-body-item">
+                    <label class="switch">
+                        <input type="checkbox" id="editStatus" class="new-item-card-body-item-input" onchange="updateModalStatus(this)">
+                        <span class="slider round"></span>
+                    </label>
+                    <span id="statusModalText">False</span>
+                </div>
+
+                
+
+
+                <div class="modal-body-item">
+                    <button class="new-item-card-body-item-button" id="update-item">Update Item</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+     <!-- End Modal  -->
+
+
+    <!-- <script src="./../../../common.js"></script> -->
+    <!-- <script src="./menu-management/items/items.js"></script> -->
+    <!-- <script src="items.js"></script> -->
+    <!-- <script src="./../../../session.js"></script> -->
+</body>
+
+</html>

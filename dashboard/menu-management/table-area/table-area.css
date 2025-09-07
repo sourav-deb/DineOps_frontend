@@ -1,0 +1,119 @@
+.new-item-card, .load-table-blocks {
+    margin-top: 10px;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: rgb(255, 243, 226);
+}
+
+.new-item-card-title {
+    font-size: large;
+    text-transform: uppercase;
+    font-weight: bold;
+    border-bottom: 2px solid black;
+}
+
+.new-item-card-body {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding-top: 20px;
+}
+
+.new-item-card-body-item {
+    flex: 1 1 200px;
+}
+  .new-item-card-body-item-input {
+      width: 50%;
+      border: none;
+      height: 30px; 
+      padding: 5px; 
+      font-size: 16px; 
+  }
+.new-item-card-body-item:last-child {
+    flex-basis: 100%;
+}
+
+.new-item-card-body-item button {
+    background-color: rgb(255, 119, 0);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+    margin-left: 20px;
+}
+
+.new-item-card-body-item button:hover {
+    background-color: rgb(255, 140, 0);
+}
+
+.table-list-head-text{
+    font-size: large;
+    text-transform: uppercase;
+    font-weight: bold;
+    border-bottom: 2px solid black;
+}
+
+.table-item {
+    display: inline-block;
+    position: relative;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+    width: 100px;
+    background-color: #cda3a3;
+    margin: 10px;
+    border: 3px dotted #7d7d7d;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.table-block {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-right: -50%;
+    transform: translate(-50%, -50%);
+    font-weight: 500;
+    font-size: 16px;
+    color: #0c0c0c;
+    text-align: center;
+}
+
+/* Refresh Button */
+
+			
+.new-item-card-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.refresh-btn {
+    background: none;
+    border: none;
+    color: #000000;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.refresh-btn:hover {
+    background-color: rgba(255, 175, 2, 0.1);
+    transform: rotate(180deg);
+}
+
+.refresh-btn i {
+    font-size: 1.2em;
+}
+
+/* Animation for refresh action */
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.refresh-btn.spinning i {
+    animation: spin 1s linear;
+}

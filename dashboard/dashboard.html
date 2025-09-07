@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Free Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="dash-style.css">
+</head>
+<body>
+    <div class="header">
+        <!-- logo -->
+        <img src="./../assets/image/logo.png" alt="Hotel Iswar Logo" class="logo">
+        <div class="header-title">Hotel Iswar</div>
+        <div class="header-items">
+            <ul>
+                <li> <a href="./../restaurant/table-info/neworder.html">New Order</a></li>
+                <!-- <li class="support">Call For Support <br> 7002246506</li> -->
+                <li><a href="./dashboard.html">Dashboard</a></li>
+                <li><a href="./../hotel/hotel.html">Hotel</a></li>
+                <li id="logout">Logout</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="screen-wrap">
+        <div class="row">
+            <div class="dashboard-nav col-2">
+                <div class="dash-nav-category">
+                    <!-- Here goes the list of Nav Items -->
+                    <div class="dash-nav-item">
+                        <div class="nav-name" id="dashboard">
+                            DASHBOARD
+                        </div>
+                    </div>
+                    <div class="dash-nav-item">
+                        <div class="nav-name" id="menu-management">
+                            MENU MANAGEMENT
+                        </div>
+                    </div>
+                    <div class="dash-nav-item">
+                        <div class="nav-name" id="service-management">
+                            SERVICE MANAGEMENT
+                        </div>
+                    </div>
+                    <div class="dash-nav-item">
+                        <div class="nav-name" id="orders">
+                            ORDERS
+                        </div>
+                    </div>
+                    <div class="dash-nav-item">
+                        <div class="nav-name" id="reports">
+                            REPORTS
+                        </div>
+                    </div>
+                    <!-- <div class="dash-nav-item">
+                        <div class="nav-name" id="accounting">
+                            ACCOUNTING
+                        </div>
+                    </div> -->
+                    <!-- <div class="dash-nav-item">
+                        <div class="nav-name" id="category-1">
+                            CONFIGURATION
+                        </div>
+                    </div>
+                    <div class="dash-nav-item">
+                        <div class="nav-name" id="category-1">
+                            CRM
+                        </div>
+                    </div> -->
+                    <!-- <div class="dash-nav-item">
+                        <div class="nav-name" id="category-1">
+                            USER MANAGEMENT
+                        </div>
+                    </div>
+                    <div class="dash-nav-item">
+                        <div class="nav-name" id="category-1">
+                            PROFILE
+                        </div>
+                    </div>
+                    <div class="dash-nav-item">
+                        <div class="nav-name" id="category-1">
+                            DINEOPS
+                        </div>
+                    </div> -->
+                    <!-- <div class="dash-nav-item">
+                        <div class="nav-name" id="category-1">
+                            HELP MANAUAL
+                        </div>
+                    </div>
+                    <div class="dash-nav-item">
+                        <div class="nav-name" id="category-1">
+                            HELP MANAUAL
+                        </div>
+                    </div>
+                    <div class="dash-nav-item">
+                        <div class="nav-name" id="category-1">
+                            HELP MANAUAL
+                        </div>
+                    </div>
+                    <div class="dash-nav-item">
+                        <div class="nav-name" id="category-1">
+                            HELP MANAUAL
+                        </div>
+                    </div> -->
+
+                </div>
+            </div>
+            <div class="dashboard-area col-10" id="dashboard-content"></div>
+        </div>
+    </div>
+    
+    <script src="./../session.js"></script>
+    <script src="./../common.js"></script>
+    <script src="dashbaord.js"></script>
+</body>
+</html>

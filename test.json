@@ -1,0 +1,227 @@
+{
+    "1": [
+        {
+            "startDate": "2024-11-18T12:32:00.000Z",
+            "endDate": "2024-11-20T06:06:00.000Z",
+            "checkInDetails": {
+                "id": 1,
+                "room_booking": 1,
+                "check_in_date": "2024-11-18T12:32:00Z",
+                "checked_in_by": 2,
+                "guests": [
+                    {
+                        "id": 3,
+                        "email": "test@gmail.com",
+                        "first_name": "test",
+                        "last_name": "test",
+                        "phone": "1234567890",
+                        "address_line_1": "test",
+                        "address_line_2": "meghalaya , indian",
+                        "guest_details": {
+                            "coming_from": "xx",
+                            "going_to": "xx",
+                            "purpose": "xx",
+                            "guest_id": [],
+                            "foreigner": false,
+                            "c_form": null
+                        }
+                    }
+                ]
+            },
+            "checkOutDate": "2024-11-20T06:06:00.000Z",
+            "status": "checked_out",
+            "bookingId": 1
+        },
+        {
+            "startDate": "2025-12-01T14:00:00.000Z",
+            "endDate": "2025-12-05T11:00:00.000Z",
+            "checkInDetails": null,
+            "checkOutDate": null,
+            "status": "pending",
+            "bookingId": 2
+        },
+        {
+            "startDate": "2024-11-22T14:11:00.000Z",
+            "endDate": "2024-11-24T21:41:00.000Z",
+            "checkInDetails": {
+                "id": 3,
+                "room_booking": 4,
+                "check_in_date": "2024-11-22T14:11:00Z",
+                "checked_in_by": 2,
+                "guests": [
+                    {
+                        "id": 3,
+                        "email": "test@gmail.com",
+                        "first_name": "test",
+                        "last_name": "test",
+                        "phone": "1234567890",
+                        "address_line_1": "test",
+                        "address_line_2": "meghalaya , indian",
+                        "guest_details": {
+                            "coming_from": "xx",
+                            "going_to": "xx",
+                            "purpose": "xx",
+                            "guest_id": [],
+                            "foreigner": false,
+                            "c_form": null
+                        }
+                    }
+                ]
+            },
+            "checkOutDate": "2024-11-24T21:41:00.000Z",
+            "status": "checked_out",
+            "bookingId": 3
+        },
+        {
+            "startDate": "2024-12-01T14:00:00.000Z",
+            "endDate": "2024-12-05T11:00:00.000Z",
+            "checkInDetails": null,
+            "checkOutDate": null,
+            "status": "pending",
+            "bookingId": 4
+        },
+        {
+            "startDate": "2024-11-27T12:00:00.000Z",
+            "endDate": "2024-11-30T12:00:00.000Z",
+            "checkInDetails": null,
+            "checkOutDate": null,
+            "status": "pending",
+            "bookingId": 8
+        }
+    ],
+    "2": [
+        {
+            "startDate": "2024-11-18T13:07:00.000Z",
+            "endDate": "2024-11-20T02:42:00.000Z",
+            "checkInDetails": {
+                "id": 2,
+                "room_booking": 3,
+                "check_in_date": "2024-11-18T13:07:00Z",
+                "checked_in_by": 2,
+                "guests": [
+                    {
+                        "id": 3,
+                        "email": "test@gmail.com",
+                        "first_name": "test",
+                        "last_name": "test",
+                        "phone": "1234567890",
+                        "address_line_1": "test",
+                        "address_line_2": "meghalaya , indian",
+                        "guest_details": {
+                            "coming_from": "xx",
+                            "going_to": "xx",
+                            "purpose": "xx",
+                            "guest_id": [],
+                            "foreigner": false,
+                            "c_form": null
+                        }
+                    }
+                ]
+            },
+            "checkOutDate": "2024-11-20T02:42:00.000Z",
+            "status": "checked_out",
+            "bookingId": 3
+        },
+        {
+            "startDate": "2024-12-01T14:00:00.000Z",
+            "endDate": "2024-12-05T11:00:00.000Z",
+            "checkInDetails": null,
+            "checkOutDate": null,
+            "status": "pending",
+            "bookingId": 5
+        },
+        {
+            "startDate": "2024-11-21T12:00:00.000Z",
+            "endDate": "2024-11-23T12:00:00.000Z",
+            "checkInDetails": null,
+            "checkOutDate": null,
+            "status": "pending",
+            "bookingId": 6
+        },
+        {
+            "startDate": "2024-11-25T12:00:00.000Z",
+            "endDate": "2024-11-28T12:00:00.000Z",
+            "checkInDetails": null,
+            "checkOutDate": null,
+            "status": "pending",
+            "bookingId": 7
+        }
+    ]
+}
+
+{
+    "id": 1,
+    "room_number": "101",
+    "room_type": "suite",
+    "beds": "double",
+    "amenities": [
+        "sunlight",
+        "refrigerator",
+        "wifi",
+        "smart-tv"
+    ],
+    "price": "2000.00",
+    "description": "",
+    "image": [],
+    "status": "available",
+    "bookings": [
+        {
+            "booking": {
+                "id": 2,
+                "booking": 2,
+                "room": 1,
+                "start_date": "2025-12-01T14:00:00Z",
+                "end_date": "2025-12-05T11:00:00Z",
+                "is_active": true,
+                "check_in_details": null,
+                "check_out_date": null,
+                "checked_out_by": null,
+                "service_usages": [],
+                "orders": []
+            },
+            "user": {
+                "id": 4,
+                "username": "5555577342",
+                "email": "rz57@example.com",
+                "first_name": "Sourav",
+                "last_name": "Deb",
+                "phone": "5555577342",
+                "address_line_1": "123 Main St",
+                "address_line_2": "Apt 4B"
+            }
+        }
+    ]
+},
+{
+    "id": 2,
+    "room_number": "102",
+    "room_type": "suite",
+    "beds": "double",
+    "amenities": [
+        "refrigerator",
+        "smart-tv"
+    ],
+    "price": "2000.00",
+    "description": "",
+    "image": [],
+    "status": "cleaning",
+    "bookings": []
+}
+
+
+
+{
+    "id": 2,
+    "room_number": "102",
+    "room_type": "suite",
+    "beds": "double",
+    "amenities": [
+        "refrigerator",
+        "smart-tv"
+    ],
+    "price": "2000.00",
+    "description": "",
+    "image": [],
+    "status": "cleaning",
+    "bookings": []
+}

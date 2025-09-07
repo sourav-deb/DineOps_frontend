@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Hotel Booking Calendar - Week View</title>
+        <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            text-align: center;
+            padding: 0;
+            position: relative;
+            height: 60px;
+            /* Adjust as needed */
+        }
+
+        th {
+            background-color: #f4f4f4;
+        }
+
+        td {
+            position: relative;
+            width: 100px;
+            /* Adjust as needed */
+        }
+
+        .half-day {
+            width: 50%;
+            height: 100%;
+            float: left;
+            text-align: center;
+            line-height: 30px;
+            /* Adjust as needed */
+            position: relative;
+        }
+
+        .booked {
+            background-color: #ffcccc;
+        }
+
+        .available {
+            background-color: #ccffcc;
+        }
+
+        .tooltip {
+            display: none;
+            position: absolute;
+            background-color: #000;
+            color: #fff;
+            padding: 5px;
+            border-radius: 3px;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            white-space: nowrap;
+        }
+
+        .half-day:hover .tooltip {
+            display: block;
+        }
+
+        .controls {
+            margin-bottom: 20px;
+        }
+
+        .controls select {
+            margin-left: 10px;
+        }
+
+        .day-cell {
+            display: flex;
+            flex-direction: row;
+            height: 60px;
+        }
+
+        .hour-cell {
+            flex: 1;
+            height: 100%;
+            width: 4px;
+            /* position: relative; */
+        }
+
+        .hour-cell[data-tooltip]:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgb(0, 0, 0);
+            color: rgb(255, 255, 255);
+            padding: 5px;
+            border-radius: 3px;
+            white-space: pre-line;
+            z-index: 1;
+            font-size: 0.9em;
+            line-height: 1.4;
+            width: 160px;
+        }
+
+        .booked {
+            background-color: rgb(95, 132, 252);
+            opacity: 0.7;
+        }
+
+        .past-booked {
+            background-color: #a0a0a0;
+            /* Or any color you prefer for past bookings */
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            right: -100%;
+            top: 0;
+            width: 100%;
+            max-width: 400px;
+            height: 100%;
+            background-color: #fff;
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+            transition: right 0.3s ease-out;
+        }
+
+        .modal.show {
+            right: 0;
+        }
+
+        .modal-content {
+            height: 100%;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 28px;
+            cursor: pointer;
+        }
+    </style>
+    </head>
+
+    <body>
+        <h1>Hotel Booking Calendar - Week View</h1>
+        <div class="controls">
+            <button id="prevWeek">Previous Week</button>
+            <button id="nextWeek">Next Week</button>
+            <label for="monthSelect">Select Month:</label>
+            <select id="monthSelect">
+            </select>
+        </div>
+        <h2 id="currentMonth"></h2>
+        <div id="calendar"></div>
+
+        <div id="bookingModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <div class="modal-body"></div>
+            </div>
+        </div>
+
+        <script src="script6.js"></script>
+    </body>
+
+</html>

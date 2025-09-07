@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="load">
+
+    </div>
+    <script src="common.js"></script>
+
+    <script>
+        function createFood(itemData) {
+            console.log(itemData);
+            const option = {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + getCookie('access_token'),
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: itemData.name,
+                    description: itemData.description,
+                    price: itemData.price,
+                    category: itemData.category,
+                    status: itemData.status,
+                    veg: itemData.veg
+                })
+            }
+
+            const url = `${baseURL}foods/fooditems/`;
+
+            refreshAccessToken(url, option)
+                // .then(response => response.json())
+                .then(data => {
+                    console.log('Data:', data);
+                    console.table(data);
+                    getFooditems();
+                    // addItemToList(data.name, data.price, data.category_id, data.description, '', data.status, data.veg);
+                    alert("Food Item Created Successfully");
+                    // window.location.reload();
+                    coldReload();
+                })
+
+                .catch(error => {
+                    console.log('Error fetching data:', error);
+                });
+        }
+    </script>
+</body>
+
+</html>

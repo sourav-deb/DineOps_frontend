@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking</title>
+    <!-- <link rel="stylesheet" href="booking.css"> -->
+    <link rel="stylesheet" href="./booking-app/booking.css">
+</head>
+
+<body>
+    <!-- Toggle checkbox -->
+    <div class="view-toggle">
+        <input type="checkbox" id="viewToggle" class="toggle-checkbox">
+        <label for="viewToggle" class="toggle-label">
+            <span class="toggle-inner"></span>
+            <span class="toggle-switch"></span>
+        </label>
+        <span class="toggle-text">Calendar View</span>
+        <div class="refresh-btn" id="refresh-btn-orders" data-tooltip="Sync All Booking">
+            <i class="fas fa-sync-alt"></i>
+        </div>
+    </div>
+
+    <div class="calender-wrapper">
+        <div class="header-row">
+            <div id="currentMonth"></div>
+            <div class="calendar-view">
+                <div class="controls">
+                    <!-- <input type="button" id="newBooking-btn" class="newBooking" value="New Booking"> -->
+                    <button id="newBooking-btn" class="newBooking">New
+                        Booking</button>
+                    <button id="prevWeek" class="preWeek">Previous
+                        Week</button>
+                    <button id="nextWeek" class="nextWeek">Next
+                        Week</button>
+                    <select id="monthSelect" class="monthSelect">
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="calender-color-indicator">
+            <div class="indicator-available">
+                <div class="color-box"></div>
+                Available
+            </div>
+            <div class="indicator-booked">
+                <div class="color-box"></div>
+                Booked
+            </div>
+            <div class="indicator-pending">
+                <div class="color-box"></div>
+                Pending
+            </div>
+            <div class="indicator-noshow">
+                <div class="color-box"></div>
+                NoShow
+            </div>
+
+            <div class="indicator-checkin">
+                <div class="color-box"></div>
+                Checkin
+            </div>
+            <div class="indicator-checkout">
+                <div class="color-box"></div>
+                Checkout
+            </div>
+        </div>
+        <div id="calendar"></div>
+    </div>
+
+    <div class="listview-wrapper" style="display: none;">
+        <div class="header-row-2">
+            <button id="newBooking-btn" class="newBooking">New
+                Booking</button>
+        </div>
+        <div class="all-bookings-list">
+            <div class="booking-list-header">
+                <div class="col-1">Booking Id</div>
+                <div class="col-1">Room</div>
+                <div class="col-2">Booking Date</div>
+                <div class="col-2">Guest Name</div>
+                <div class="col-2">From</div>
+                <div class="col-2">To</div>
+                <div class="col-1">Status</div>
+                <div class="col-1">Actions</div>
+            </div>
+            <div class="booking-list-body"></div>
+        </div>
+    </div>
+
+    <!-- Modal: View Data from bookings -->
+    <div class="modal-container">
+        <div id="bookingModal" class="calendar-modal">
+            <div class="modal-content">
+                <div class="modal-header-wrapper">
+                    <span class="close">&times;</span>
+                    <div class="model-content-title-2 modal-header-2">Booking Details</div>
+                </div> 
+                <div class="modal-body"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: New Booking -->
+    <div class="modal-container-2">
+        <div id="newBookingModal" class="new-booking">
+            <div class="modal-content-2">
+                <div class="modal-header">
+                    <span class="close2">&times;</span>
+                    <div class="model-content-title-2">New Booking</div>
+                </div>
+                <div class="booking-details-col">
+                    <div class="modal-body-booking">
+                        <div class="booking-form">
+
+                            <!-- <div class="input-element">
+                                <label for="bookingDate">Date</label>
+                                <input type="date" id="bookingDate" name="bookingDate" required>
+                            </div>
+                            <div class="input-element">
+                                <label for="bookingTime">Time</label>
+                                <input type="time" id="bookingTime" name="bookingTime" required value="12:00">
+                            </div> -->
+
+                            <div class="input-element-add-room">
+                                <div class="row" id="room-1">
+                                    <div class="input-element">
+                                        <label for="roomSelect-1">Room
+                                            (first select date)</label>
+                                        <select disabled class="rooms-btn" id="roomSelect-1">
+                                            <option selected disabled>Select
+                                                Room</option>
+                                        </select>
+                                    </div>
+                                    <div class="input-element ele-room">
+                                        <label for="startDate-1">Start
+                                            Date</label>
+                                        <!-- <input type="date" id="startDate-1" name="startDate" required> -->
+
+                                        <input type="datetime-local" id="startDate-1" name="startDate">
+
+                                        <label for="endDate-1">End
+                                            Date</label>
+                                        <!-- <input type="date" id="endDate-1" name="endDate" required> -->
+
+                                        <input type="datetime-local" id="endDate-1" name="endDate">
+
+                                        <i class="fa-solid fa-circle-plus fa-2x" id="add-more-btn"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="input-element">
+                                <label for="bookingPhone">Phone</label>
+                                <input type="text" id="bookingPhone" name="bookingPhone" required
+                                    placeholder="+91 12345 67890">
+                            </div>
+                            <div class="input-element">
+                                <label for="bookingEmail">Email</label>
+                                <input type="email" id="bookingEmail" name="bookingEmail"
+                                    placeholder="name@example.com">
+                            </div>
+                            <div class="input-element">
+                                <label for="bookingFname">First Name</label>
+                                <input type="text" id="bookingFname" name="bookingFname" required
+                                    placeholder="First Name">
+                            </div>
+                            <div class="input-element">
+                                <label for="bookingLname">Last Name</label>
+                                <input type="text" id="bookingLname" name="bookingLname" required
+                                    placeholder="Last Name">
+                            </div>
+                            <div class="input-element">
+                                <label for="customerNationality">Nationality</label>
+                                <!-- <input type="text" id="customerNationality" name="customerNationality" value="indian"  placeholder="Last Name"> -->
+                                <select name id="customerNationality">
+                                    <option value selected disabled>Select
+                                        Nationality</option>
+                                    <option value="indian">Indian</option>
+                                    <option value="others">Others</option>
+                                </select>
+                            </div>
+                            <div class="input-element" id="customerState-div">
+                                <label for="customerState">State /
+                                    Province</label>
+                                <div id="state-input-select">
+                                    <select name="customerState" id="customerState">
+                                        <option selected disabled>Select
+                                            State</option>
+                                        <!-- States -->
+                                        <option value="andhra_pradesh">Andhra
+                                            Pradesh</option>
+                                        <option value="arunachal_pradesh">Arunachal
+                                            Pradesh</option>
+                                        <option value="assam">Assam</option>
+                                        <option value="bihar">Bihar</option>
+                                        <option value="chhattisgarh">Chhattisgarh</option>
+                                        <option value="goa">Goa</option>
+                                        <option value="gujarat">Gujarat</option>
+                                        <option value="haryana">Haryana</option>
+                                        <option value="himachal_pradesh">Himachal
+                                            Pradesh</option>
+                                        <option value="jharkhand">Jharkhand</option>
+                                        <option value="karnataka">Karnataka</option>
+                                        <option value="kerala">Kerala</option>
+                                        <option value="madhya_pradesh">Madhya
+                                            Pradesh</option>
+                                        <option value="maharashtra">Maharashtra</option>
+                                        <option value="manipur">Manipur</option>
+                                        <option value="meghalaya">Meghalaya</option>
+                                        <option value="mizoram">Mizoram</option>
+                                        <option value="nagaland">Nagaland</option>
+                                        <option value="odisha">Odisha</option>
+                                        <option value="punjab">Punjab</option>
+                                        <option value="rajasthan">Rajasthan</option>
+                                        <option value="sikkim">Sikkim</option>
+                                        <option value="tamil_nadu">Tamil
+                                            Nadu</option>
+                                        <option value="telangana">Telangana</option>
+                                        <option value="tripura">Tripura</option>
+                                        <option value="uttar_pradesh">Uttar
+                                            Pradesh</option>
+                                        <option value="uttarakhand">Uttarakhand</option>
+                                        <option value="west_bengal">West
+                                            Bengal</option>
+
+                                        <!-- Union Territories -->
+                                        <option value="andaman_and_nicobar_islands">Andaman
+                                            and Nicobar Islands</option>
+                                        <option value="chandigarh">Chandigarh</option>
+                                        <option value="dadra_and_nagar_haveli_and_daman_and_diu">Dadra
+                                            and Nagar Haveli
+                                            and
+                                            Daman and Diu</option>
+                                        <option value="delhi">Delhi</option>
+                                        <option value="lakshadweep">Lakshadweep</option>
+                                        <option value="puducherry">Puducherry</option>
+                                        <option value="ladakh">Ladakh</option>
+                                        <option value="jammu_and_kashmir">Jammu
+                                            and Kashmir</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="input-element address">
+                                <label for="bookingAddress">Address</label>
+                                <input type="text" id="bookingAddress" name="bookingAddress" required
+                                    placeholder="Address">
+                            </div>
+
+                            <div class="input-element">
+                                <label for="customerId">ID Card</label>
+                                <input type="file" id="customerId" name="customerId[]" multiple
+                                    file-type="image/* , pdf/*">
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="booking-payment-col">
+                    <div class="total-booking-amount">Total Booking
+                        Amount</div>
+                    <div class="total-booking-amount-value">₹ 0.00</div>
+
+                    <div class="advance-booking-amount">Advance (₹)</div>
+                    <input type="text" class="advance-booking-amount-input" name="advance-booking-amount"
+                        id="advance-booking-amount" placeholder="0.00">
+
+                    <button class="new-booking-btn" id="new-booking-btn">Book</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: CheckIn for bookings -->
+    <div class="modal-container-3">
+        <div id="checkinModal" class="checkin-modal">
+            <div class="modal-content-3">
+                <div class="modal-checkin-header">
+                    <span class="close3">&times;</span>
+                    <div class="heading">Check-In Form</div>
+                </div>
+                <div class="modal-body" id="checkinModalBody">
+                    <div class="modal-form" id="checkin-form">
+                        <div class="input-element-checkin lg room-number">
+                            <label for="cim-roomNumber">Room Number</label>
+                            <input type="text" id="cim-roomNumber" name="roomNumber" disabled required>
+                        </div>
+                        <div class="input-element-checkin lg">
+                            <label for="cim-checkinDateTime">Check-in Date
+                                and Time:</label>
+                            <input type="datetime-local" id="cim-checkinDateTime" name="checkinDateTime">
+                        </div>
+
+                        <div class="row-block" id="guest-info-row-checkin">
+                            <div class="input-element-checkin ">
+                                <label for="cim-firstName">First
+                                    Name</label>
+                                <input type="text" id="cim-firstName" name="firstName" required>
+                            </div>
+                            <div class="input-element-checkin ">
+                                <label for="cim-lastName">Last Name</label>
+                                <input type="text" id="cim-lastName" name="lastName" required>
+                            </div>
+                            <div class="input-element-checkin sm">
+                                <label for="cim-guestphone">Guest
+                                    Phone</label>
+                                <input type="text" id="cim-guestphone" name="guestphone" required>
+                            </div>
+                            <div class="input-element-checkin sm">
+                                <label for="cim-guestemail">Guest
+                                    Email</label>
+                                <input type="email" id="cim-guestemail" name="guestemail" required>
+                            </div>
+                            <div class="input-element-checkin sm">
+                                <label for="cim-dob">D.O.B.</label>
+                                <input type="date" id="cim-dob" name="dob" required>
+                            </div>
+
+                            <div class="input-element-checkin lg address-height">
+                                <label for="cim-address-1">Full
+                                    Address</label>
+                                <textarea type="text" id="cim-address-1" name="address-1" placeholder="Full Address"
+                                    required rows="3"></textarea>
+                            </div>
+
+                            <div class="input-element-checkin">
+                                <label for="cim-customerNationality">Nationality</label>
+                                <select name="nationality" id="cim-customerNationality">
+                                    <option value selected disabled>Select
+                                        Nationality</option>
+                                    <option value="indian">Indian</option>
+                                    <option value="others">Others</option>
+                                </select>
+                            </div>
+                            <div class="input-element-checkin" id="customerState-div">
+                                <label for="cim-customerState">State /
+                                    Province</label>
+                                <div id="state-input-select">
+                                    <select name="customerState" id="cim-customerState">
+                                        <option selected disabled>Select
+                                            State</option>
+                                        <!-- States -->
+                                        <option value="andhra_pradesh">Andhra
+                                            Pradesh</option>
+                                        <option value="arunachal_pradesh">Arunachal
+                                            Pradesh</option>
+                                        <option value="assam">Assam</option>
+                                        <option value="bihar">Bihar</option>
+                                        <option value="chhattisgarh">Chhattisgarh</option>
+                                        <option value="goa">Goa</option>
+                                        <option value="gujarat">Gujarat</option>
+                                        <option value="haryana">Haryana</option>
+                                        <option value="himachal_pradesh">Himachal
+                                            Pradesh</option>
+                                        <option value="jharkhand">Jharkhand</option>
+                                        <option value="karnataka">Karnataka</option>
+                                        <option value="kerala">Kerala</option>
+                                        <option value="madhya_pradesh">Madhya
+                                            Pradesh</option>
+                                        <option value="maharashtra">Maharashtra</option>
+                                        <option value="manipur">Manipur</option>
+                                        <option value="meghalaya">Meghalaya</option>
+                                        <option value="mizoram">Mizoram</option>
+                                        <option value="nagaland">Nagaland</option>
+                                        <option value="odisha">Odisha</option>
+                                        <option value="punjab">Punjab</option>
+                                        <option value="rajasthan">Rajasthan</option>
+                                        <option value="sikkim">Sikkim</option>
+                                        <option value="tamil_nadu">Tamil
+                                            Nadu</option>
+                                        <option value="telangana">Telangana</option>
+                                        <option value="tripura">Tripura</option>
+                                        <option value="uttar_pradesh">Uttar
+                                            Pradesh</option>
+                                        <option value="uttarakhand">Uttarakhand</option>
+                                        <option value="west_bengal">West
+                                            Bengal</option>
+
+                                        <!-- Union Territories -->
+                                        <option value="andaman_and_nicobar_islands">Andaman
+                                            and Nicobar Islands</option>
+                                        <option value="chandigarh">Chandigarh</option>
+                                        <option value="dadra_and_nagar_haveli_and_daman_and_diu">Dadra
+                                            and Nagar Haveli
+                                            and
+                                            Daman and Diu</option>
+                                        <option value="delhi">Delhi</option>
+                                        <option value="lakshadweep">Lakshadweep</option>
+                                        <option value="puducherry">Puducherry</option>
+                                        <option value="ladakh">Ladakh</option>
+                                        <option value="jammu_and_kashmir">Jammu
+                                            and Kashmir</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="input-element-checkin">
+                                <label for="cim-coming">Coming from</label>
+                                <input type="text" id="cim-coming" name="coming" placeholder="Coming from" required>
+                            </div>
+                            <div class="input-element-checkin">
+                                <label for="cim-going">Going to</label>
+                                <input type="text" id="cim-going" name="going" placeholder="Going to" required>
+                            </div>
+                            <div class="input-element-checkin">
+                                <label for="cim-purpose">Purpose of
+                                    Visit</label>
+                                <input type="text" id="cim-purpose" name="purpose" placeholder="Purpose of Visit"
+                                    required>
+                            </div>
+                            <div class="input-element-checkin sm">
+                                <label for="cim-idcard">ID Card</label>
+                                <input type="file" id="cim-idcard" name="idcard" required multiple>
+                            </div>
+
+                            <i class="fa-solid fa-circle-plus fa-2x add-more-info-btn" id="add-more-btn-checkin"></i>
+                        </div>
+
+                    </div>
+                    <button class="checkin-btn" id="checkin-btn">Check-In</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Services booking after checkin -->
+    <div class="modal-container-4">
+        <div id="serviceModal" class="service-modal">
+            <div class="modal-content-4">
+                <div class="modal-checkin-header">
+                    <span class="close4">&times;</span>
+                    <div class="heading">Book Services</div>
+                </div>
+                <div class="modal-body-service" id="serviceModalBody">
+                    <div class="input-element-service room-number">
+                        <label for="serviceRoomNumber">Room Number</label>
+                        <input type="text" id="serviceRoomNumber" name="roomNumber" disabled required>
+                    </div>
+                    <div class="input-element-service">
+                        <label for="serviceService">Service</label>
+                        <select name="service" id="serviceService">
+                            <option value selected disabled>Select
+                                Service</option>
+                        </select>
+                    </div>
+                    <div class="input-element-service" style="display: none;">
+                        <label for="serviceQuantity">Quantity</label>
+                        <input type="number" id="serviceQuantity" name="quantity" required min="1">
+                    </div>
+                    <div class="input-element-service total-price">
+                        <label for="serviceTotalPrice">Total Price</label>
+                        <input type="text" id="serviceTotalPrice" name="totalPrice" disabled>
+                    </div>
+
+                    <button class="service-btn" id="service-btn">Book
+                        Service</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- Modal: CheckOut for bookings -->
+    <div class="modal-container-5">
+        <div id="checkOutModal" class="checkout-modal">
+            <div class="modal-content-5">
+                <div class="modal-checkout-header">
+                    <span class="close5">&times;</span>
+                    <div class="heading">Check Out Form</div>
+                </div>
+                <div class="modal-body-checkout" id="checkOutModalBody">
+                    <div class="input-element-checkout room-number">
+                        <label for="checkoutRoomNumber">Room Number</label>
+                        <input type="text" id="checkoutRoomNumber" name="roomNumber" disabled required>
+                    </div>
+                    <div class="input-element-checkout">
+                        <label for="checkoutCheckoutDateTime">Check-out Date and
+                            Time:</label>
+                        <input type="datetime-local" id="checkoutCheckoutDateTime" name="checkoutDateTime">
+                    </div>
+
+                    <button class="checkout-btn" id="checkout-btn">Check-Out</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: View Data from bookings -->
+    <div class="modal-container-6">
+        <div id="settleModal" class="settle-modal">
+            <div class="modal-content">
+                <div class="modal-head">
+                    <span class="close-settle">&times;</span>
+                    <div class="modal-title">GENERATE BILL</div>
+                </div>
+                <div class="modal-body-6">
+                    <div class="generate-bill-form">
+                        <div class="input-group-bill">
+                            <label for="booking-id">Booking Id.</label>
+                            <input type="text" id="booking-id" placeholder="Booking Id." disabled>
+                        </div>
+
+                        <div class="input-group-bill">
+                            <label for="room-discount">Room Discount
+                                (₹):</label>
+                            <input type="number" id="room-discount" placeholder="0.00">
+                        </div>
+
+                        <div class="input-group-bill">
+                            <label for="order-discount">Order Discount
+                                (₹):</label>
+                            <input type="number" id="order-discount" placeholder="0.00">
+                        </div>
+
+                        <div class="input-group-bill customer_gst">
+                            <label for="customer_gst">Customer GST No:</label>
+                            <input type="text" id="customer_gst" placeholder="11XXXXX0000XX0XX ">
+                        </div>
+
+                    </div>
+
+                    <div class="button-groups">
+                        <button class="print-bill-btn" id="gen-billBtn">GENERATE
+                            BILL</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Edit Booking -->
+    <div class="modal-container-7">
+        <div id="editBookingModal" class="edit-booking">
+            <div class="modal-content-7">
+                <div class="modal-header">
+                    <span class="close7">&times;</span>
+                    <div class="model-content-title-2">Edit Room Timings</div>
+                </div>
+
+                <div class id="editBooking-content">
+
+                    <div class="input-element address">
+                        <label for="editExistingRoom">Edit Room</label>
+                        <input type="text" id="editExistingRoom" name="editExistingRoom" disabled>
+                    </div>
+                    <div class="input-element">
+                        <label for="editStartTime">Existing Start Time</label>
+                        <input type="text" id="editStartTime" name="editStartTime" disabled>
+                    </div>
+                    <div class="input-element">
+                        <label for="editLastTime">Existing End Time</label>
+                        <input type="text" id="editLastTime" name="editLastTime" disabled>
+                    </div>
+                    <div class="input-element">
+                        <label for="newstartDate">New Start Date</label>
+                        <input type="datetime-local" id="newstartDate" name="newstartDate">
+                    </div>
+                    <div class="input-element">
+                        <label for="newendDate">New End Date</label>
+                        <input type="datetime-local" id="newendDate" name="newendDate">
+                    </div>
+
+                    <button class="edit-booking-btn" id="edit-booking-btn">Submit</button>
+
+
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modal for Edit Booking Details -->
+    <div class="modal-container-8">
+        <div id="editBookingDetailsModal" class="payment-modal">
+            <div class="modal-content">
+                <div class="modal-head">
+                    <span class="close-edit">&times;</span>
+                    <div class="modal-title">EDIT BOOKING DETAILS</div>
+                </div>
+                <div class="modal-body">
+                    <div class="generate-bill-form">
+                        <div class="input-group-bill">
+                            <label for="editbooking-id">Booking ID</label>
+                            <input type="text" id="edit-booking-id" disabled>
+                        </div>
+                        <div class="input-group-bill">
+                            <label for="edit-first-name">First Name</label>
+                            <input type="text" id="edit-first-name">
+                        </div>
+                        <div class="input-group-bill">
+                            <label for="edit-last-name">Last Name</label>
+                            <input type="text" id="edit-last-name">
+                        </div>
+                        <div class="input-group-bill">
+                            <label for="phone">Phone</label>
+                            <input type="text" id="edit-phone">
+                        </div>
+                        <div class="input-group-bill">
+                            <label for="email">Email</label>
+                            <input type="email" id="edit-email">
+                        </div>
+                        <!-- <div class="input-group-bill">
+                            <label for="address">Address</label>
+                            <input type="text" id="edit-address">
+                        </div> -->
+                        <div class="button-groups">
+                            <button class="print-bill-btn" id="update-booking-btn">UPDATE
+                                DETAILS</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="booking.js"></script>
+    <script src="./booking-app/booking.js"></script>
+    <script>
+        // let rowCount = 1;
+        // let rowCountStart = 0;
+    </script>
+</body>
+
+</html>
