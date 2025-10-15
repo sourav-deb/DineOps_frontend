@@ -699,7 +699,7 @@ function createSummaryPage(item) {
                     <td class="amount">₹ ${roomTotal.toFixed(2)}</td>
                 </tr>
                 <tr>
-                    <td>GST 12% (CGST + SGST):</td>
+                    <td>GST 5% (CGST + SGST):</td>
                     <td class="amount">₹ ${roomGST.toFixed(2)}</td>
                 </tr>
                 <tr class="subtotal">
