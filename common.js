@@ -2,7 +2,7 @@
 // baseURL = 'http://backend.hoteliswar.in:8001/api/';
 baseURL = 'https://iswar-d.pserver.codeartisanriz.me/api/';
 // Disable all console statements
-// terminateConsole();
+terminateConsole();
 
 // console.log(baseURL);
 
