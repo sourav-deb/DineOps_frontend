@@ -1,9 +1,10 @@
 
 
 // Putting Options in category list
-function putCategoryInSelect() {
+// Putting Options in category list
+async function putCategoryInSelect() {
     let selectCategory = document.getElementById('new-item-catg');     // Create
-    categoryData = getCategoryListFromStorage();
+    let categoryData = await getCategoryListFromStorage();
     console.log('Items.js called........')
     console.table(categoryData);
 
@@ -18,7 +19,7 @@ function putCategoryInSelect() {
 
     // Put in Modal Select
     let editModalCategory = document.getElementById('editCategory');  // Modal
-    categoryData = getCategoryListFromStorage();
+    categoryData = await getCategoryListFromStorage();
     console.log('Items.js called........')
     console.table(categoryData);
 
@@ -69,8 +70,9 @@ function addItemToList(name, price, category, description, imageSrc, status, id,
 
     // Add event listener to the edit button of the last added row
     const editButton = lastAddedRow.querySelector('.edit-btn');
-    editButton.addEventListener('click', () => {
-        openEditModal(name, price, category, description, imageSrc, status, id, veg);
+    editButton.addEventListener('click', async () => {
+        const categoryId = await getCatgIdByName(category);
+        openEditModal(name, price, category, description, imageSrc, status, id, veg, categoryId);
     });
 }
 
@@ -79,7 +81,7 @@ function addItemToList(name, price, category, description, imageSrc, status, id,
 async function deleteFood(id) {
 
     // get item name using id from local storage
-    const allFoodList = JSON.parse(localStorage.getItem('allFoodList'));
+    const allFoodList = await localforage.getItem('allFoodList');
     const itemName = allFoodList.find(item => item.id === id).name;
 
     // Use confirm() instead of alert() to get user input
@@ -100,9 +102,9 @@ async function deleteFood(id) {
             .then(async data => {
                 console.log('Data Deleted:', data);
 
-                const allFoodList = JSON.parse(localStorage.getItem('allFoodList'));
+                const allFoodList = await localforage.getItem('allFoodList');
                 const updatedList = allFoodList.filter(item => item.id !== id);
-                localStorage.setItem('allFoodList', JSON.stringify(updatedList));
+                await localforage.setItem('allFoodList', updatedList);
 
                 alert(`${itemName} Deleted Successfully`, 'success');
                 document.getElementById('nav-item-items').click();
@@ -117,14 +119,14 @@ async function deleteFood(id) {
 }
 
 // Local Storage Call to get Category ID by Category Name from localStorage
-function getCatgIdByName(name) {
-    const categoryData = getCategoryListFromStorage();
+async function getCatgIdByName(name) {
+    const categoryData = await getCategoryListFromStorage();
     const category = categoryData.find(category => category.name === name);
     return category ? category.id : null;
 }
 
 // Open Update Modal
-function openEditModal(name, price, category, description, imageSrc, status, id, veg) {
+function openEditModal(name, price, categoryName, description, imageSrc, status, id, veg, categoryId) {
     const modal = document.getElementById('editModal');
     const editName = document.getElementById('editName');
     const editPrice = document.getElementById('editPrice');
@@ -152,7 +154,7 @@ function openEditModal(name, price, category, description, imageSrc, status, id,
     }
     editName.value = name;
     editPrice.value = price;
-    editCategory.value = getCatgIdByName(category);
+    editCategory.value = categoryId;
     editDescription.value = description;
     // editImage.setAttribute('value', imageSrc);
     // editImage.value = imageSrc;
@@ -265,11 +267,13 @@ document.getElementById('update-item').addEventListener('click', function (e) {
             // .then(response => response.json())
             .then(async data => {
                 console.log('Item updated successfully:', data);
-                const allFoodList = JSON.parse(localStorage.getItem('allFoodList') || '[]');
+                // const allFoodList = JSON.parse(localStorage.getItem('allFoodList') || '[]');
+                const allFoodList = await localforage.getItem('allFoodList') || [];
                 const updatedItemIndex = allFoodList.findIndex(item => item.id == updatedItem.id);
                 if (updatedItemIndex !== -1) {
                     allFoodList[updatedItemIndex] = data;
-                    localStorage.setItem('allFoodList', JSON.stringify(allFoodList));
+                    // localStorage.setItem('allFoodList', JSON.stringify(allFoodList));
+                    await localforage.setItem('allFoodList', allFoodList);
                 }
 
                 document.querySelector('.close').click();
@@ -336,11 +340,15 @@ document.getElementById('update-item').addEventListener('click', function (e) {
 // getAllFoodListFromStorage();
 
 
-if (foodData = getAllFoodListFromStorage()) {
-    passToFoodList(foodData);
-} else {
-    console.log('No data in storage');
+async function loadFoodItems() {
+    let foodData = await getAllFoodListFromStorage();
+    if (foodData) {
+        passToFoodList(foodData);
+    } else {
+        console.log('No data in storage');
+    }
 }
+loadFoodItems();
 
 function passToFoodList(data) {
     data.forEach(item => {

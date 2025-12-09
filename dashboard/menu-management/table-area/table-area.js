@@ -2,18 +2,19 @@
 
 document.querySelector('.load-table-blocks').textContent = 'No Table Found';
 
-// Retrieve tableList from localStorage
+// Retrieve tableList from localForage
 async function getTableListFromLocalStorage() {
-    const storedTableList = localStorage.getItem('tablesList');
+    const storedTableList = await localforage.getItem('tablesList');
     console.log('Stored Table List:', storedTableList);
-    return storedTableList ? JSON.parse(storedTableList) : [];
+    // return storedTableList ? JSON.parse(storedTableList) : [];
+    return storedTableList || [];
 }
 
-console.log('Table List:', getTableListFromLocalStorage());
+// console.log('Table List:', getTableListFromLocalStorage());
 
 // Function to render the table list in HTML
 async function renderTableList() {
-    const tableList = await getTableListFromLocalStorage();
+    let tableList = await getTableListFromLocalStorage();
 
     if (tableList.length === 0) {
         await Promise.all([getTablesData()]);
@@ -67,17 +68,16 @@ async function addTable(tableData) {
                 alert(`Table ${data.table_number} added successfully`, 'success');
 
                 await Promise.all([getTablesData()]);
+
+                await coldReload();
+
+                // tableList.push(tableData); // You might rely on getTablesData to update storage
+                renderTableList();
             })
             .catch(error => {
                 console.log('Error fetching data:', error);
                 alert('Table not added', 'error');
             });
-
-        await coldReload();
-
-        // tableList.push(tableData);
-        localStorage.setItem('tablesList', JSON.stringify(tableList));
-        renderTableList();
     } else {
         alert(`Table ${tableData.table_number} already exists.`, 'warning');
         console.log(`Table ${tableData.table_number} already exists.`);
@@ -119,7 +119,7 @@ function refreshCategoryList() {
     const button = document.querySelector('#refresh-btn');
     button.classList.add('spinning');
     console.log('Refreshing Category List');
-    
+
     // Call your existing category fetch function here
     getTablesData()
         .then(() => {
@@ -133,7 +133,7 @@ function refreshCategoryList() {
             console.error('Error refreshing categories:', error);
             button.classList.remove('spinning');
         });
-    
+
 
 }
 

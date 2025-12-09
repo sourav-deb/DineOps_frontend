@@ -6,10 +6,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 async function updateStats() {
-    // Get all required data from localStorage
-    const rooms = JSON.parse(localStorage.getItem('roomsList') || '[]');
-    const bookings = JSON.parse(localStorage.getItem('allBookings') || '[]');
-    const orders = JSON.parse(localStorage.getItem('allOrders') || '[]');
+    // Get all required data from localForage
+    const rooms = await localforage.getItem('roomsList') || [];
+    const bookings = await localforage.getItem('allBookings') || [];
+    const orders = await localforage.getItem('allOrders') || [];
 
     // Get current date for comparison
     const now = new Date();

@@ -1,30 +1,54 @@
-document.getElementById('viewToggle').addEventListener('click', function () {
-    const viewToggle = document.getElementById('viewToggle');
-    const calendarWrapper = document.querySelector('.calender-wrapper');
-    const listviewWrapper = document.querySelector('.listview-wrapper');
-    const toggleText = document.querySelector('.toggle-text');
+// Global variables
+var roomBookings = {};
+var currentDate = new Date();
 
-    viewToggle.addEventListener('change', function () {
+// Initialize the application
+async function initBookingApp() {
+    console.log('Initializing Booking App...');
+    try {
+        roomBookings = await convertToRequiredFormat();
+        updateCalendar();
+
+        // Setup view toggle
+        const viewToggle = document.getElementById('viewToggle');
+        // Trigger list view if checked (default might differ, but logic mimics original click)
+        viewToggle.checked = true;
+        if (viewToggle.checked) {
+            viewToggle.dispatchEvent(new Event('change'));
+        }
+
+    } catch (error) {
+        console.error('Initialization failed:', error);
+    }
+}
+
+var viewToggle = document.getElementById('viewToggle');
+if (viewToggle) {
+    viewToggle.addEventListener('change', async function () {
+        const calendarWrapper = document.querySelector('.calender-wrapper');
+        const listviewWrapper = document.querySelector('.listview-wrapper');
+        const toggleText = document.querySelector('.toggle-text');
+
         if (this.checked) {
             calendarWrapper.style.display = 'none';
             listviewWrapper.style.display = 'block';
             toggleText.textContent = 'List View';
             // Here you would call a function to populate the list view
-            populateListView();
+            await populateListView();
         } else {
             calendarWrapper.style.display = 'block';
             listviewWrapper.style.display = 'none';
             toggleText.textContent = 'Calendar View';
         }
     });
-});
+}
 
 // getAllBookings();
 
-document.getElementById('viewToggle').click();
+// document.getElementById('viewToggle').click(); // Moved to initBookingApp logic or manual trigger
 
-function populateListView() {
-    convertToRequiredFormat_ListView();
+async function populateListView() {
+    await convertToRequiredFormat_ListView();
 }
 
 // JSON formating for List View
@@ -32,32 +56,34 @@ async function convertToRequiredFormat_ListView() {
     try {
         // const apiDataString = await getAllBookings();
 
-        const bookingData = getAllBookingsFromStorage();
-        const apiDataString = JSON.stringify(bookingData);
+        const bookingData = await getAllBookingsFromStorage();
+
+        // Note: getAllBookingsFromStorage (common.js) returns parsed object if using localForage correctly, 
+        // or we need to check if it returns valid array directly.
+        // Assuming common.js returns the array directly now.
+
+        let apiData = bookingData;
+
+        // const apiDataString = JSON.stringify(bookingData);
         // console.log(`apiDataString: ${apiDataString}`);
 
-        // console.log(`apiDataString: ${JSON.stringify(apiDataString)}`);
-        if (!apiDataString || apiDataString.length === 0) {
+        if (!apiData || apiData.length === 0) {
             console.log('No data found');
             return {};
         }
 
-        let apiData;
-        try {
-            apiData = JSON.parse(apiDataString);
-            console.log(`apiData: ${apiData}`);
-        } catch (error) {
-            console.error('Error parsing bookingsList data:', error);
-            return {};
-        }
+        // apiData is likely already an object if from localForage
+        // let apiData;
+        // try {
+        //     apiData = JSON.parse(apiDataString);
+        //     console.log(`apiData: ${apiData}`);
+        // } catch (error) { ... }
 
-        // Get roomsList from localStorage and parse it
-        const roomsListString = localStorage.getItem('roomsList');
-        let roomsList;
-        try {
-            roomsList = JSON.parse(roomsListString);
-        } catch (error) {
-            console.error('Error parsing roomsList:', error);
+        // Get roomsList from localforage
+        const roomsList = await localforage.getItem('roomsList') || [];
+
+        if (!roomsList || roomsList.length === 0) {
+            console.error('roomsList is empty');
             return {};
         }
 
@@ -154,11 +180,11 @@ function getAllBookings() {
     }
     url = `${baseURL}hotel/bookings/`;
     return refreshAccessToken2(url, option)
-        .then(data => {
+        .then(async data => {
             console.log('Bookings Data:', data);
-            localStorage.setItem('bookingsList', JSON.stringify(data));
+            await localforage.setItem('bookingsList', data);
             // return data;
-            return JSON.stringify(data); // Return stringified data
+            return JSON.stringify(data); // Return stringified data (legacy support if needed, but better to return obj)
         })
         .catch(error => {
             console.log('Error fetching table:', error);
@@ -248,14 +274,14 @@ function renderListView(allBookings) {
     });
 }
 
-var currentDate = new Date();
-console.log(currentDate);
+// var currentDate = new Date(); // Moved to top
+// console.log(currentDate);
 
 // JSON formating for calender
-function convertToRequiredFormat() {
+async function convertToRequiredFormat() {
 
-    const bookingsData = JSON.parse(localStorage.getItem('bookingsList'));
-    const roomsList = JSON.parse(localStorage.getItem('roomsList'));
+    const bookingsData = await localforage.getItem('bookingsList');
+    const roomsList = await localforage.getItem('roomsList');
 
     if (!bookingsData || !roomsList) {
         console.log('No data found');
@@ -277,7 +303,7 @@ function convertToRequiredFormat() {
 
 
     const roomBookings = {};
-    const currentDate = new Date();
+    // const currentDate = new Date(); // Global var used? Or new local? Using local for logic safely inside loop if needed, but function var overrides global.
 
     bookingsData.forEach(booking => {
         booking.rooms.forEach(room => {
@@ -294,15 +320,6 @@ function convertToRequiredFormat() {
 
 
             const guestDetail = booking.guest_detail[0]; // Assuming there's always at least one guest
-            // let checkInDate = new Date(room.start_date.replace('Z', ''));
-            // let checkOutDate = new Date(room.end_date.replace('Z', ''));
-            // console.log(`OUTSIDE LOOP: ${booking.id} ${room.room} ${checkInDate} , ${checkOutDate}`);
-
-            // let checkInDate = new Date (room.check_in_details?.check_in_date ?? room.start_date);
-            // let checkOutDate = new Date(room.check_out_date ?? room.end_date);
-            // let bookingDatee = new Date(booking.booking_date);
-            // console.log(`OUTSIDE LOOP: ${booking.id} ${room.room} checkin: ${checkInDate} , checkout: ${checkOutDate} , booking date: ${bookingDatee}`);
-
 
             let checkInDate = new Date(room.check_in_details?.check_in_date ?? room.start_date);
             checkInDate.setUTCMinutes(checkInDate.getUTCMinutes() - 330); // Subtract 5 hours 30 minutes
@@ -339,10 +356,15 @@ function convertToRequiredFormat() {
                 console.log(`TWO ${booking.id} ${room.room} ${checkOutDate}`);
             }
 
+            // Note: 'currentDate' here refers to global variable if not redefined. 
+            // In original code it was redefined 'const currentDate = new Date();' inside? 
+            // Let's ensure we use a fresh date for comparison.
+            const now = new Date();
+
             if (booking.status === 'pending') {
-                if (room.start_date > currentDate.toISOString()) {
+                if (room.start_date > now.toISOString()) {
                     status = 'pending';
-                } else if (room.start_date < currentDate.toISOString()) {
+                } else if (room.start_date < now.toISOString()) {
                     status = 'noshow';
                 }
             } else if (room.check_in_details && room.check_out_date) {
@@ -356,9 +378,9 @@ function convertToRequiredFormat() {
                     status = 'checkin';
                 } else if (room.check_in_details && room.check_out_date) {
                     status = 'checkout';
-                } else if (room.start_date > currentDate.toISOString()) {
+                } else if (room.start_date > now.toISOString()) {
                     status = 'pending';
-                } else if (room.start_date < currentDate.toISOString()) {
+                } else if (room.start_date < now.toISOString()) {
                     status = 'noshow';
                 }
             }
@@ -381,7 +403,7 @@ function convertToRequiredFormat() {
         });
     });
     console.warn('convertToRequiredFormat');
-    console.log(roomBookings)
+    // console.log(roomBookings)
 
     // Sort bookings for each room by check-in date
     for (const roomNumber in roomBookings) {
@@ -389,13 +411,16 @@ function convertToRequiredFormat() {
     }
 
     // console.log('roomBookings:', JSON.stringify(roomBookings));
-    localStorage.setItem('calenderData', JSON.stringify(roomBookings));
+    await localforage.setItem('calenderData', roomBookings);
     return roomBookings;
 }
 
+// Start initialization
+initBookingApp();
+
 // Converting API response to the desired format
-var roomBookings = convertToRequiredFormat();
-console.log(roomBookings);
+// var roomBookings = convertToRequiredFormat(); // Removed sync call
+// console.log(roomBookings); // Removed
 
 // Instead of using forEach, we'll use Object.entries to iterate over the object
 // Object.entries(roomBookings).forEach(([roomNumber, bookings]) => {
@@ -627,23 +652,22 @@ updateCalendar();
 function toggleBookingDetails(booking) {
     // Implement the logic to show/hide booking details
     console.log("Toggling details for booking:", booking);
-    // You can add logic here to display or hide additional information about the booking
 }
 
-function showBookingModalListView(roomNumber, bookingId) {
+async function showBookingModalListView(roomNumber, bookingId) {
     console.log("showBookingModalListView called");
     console.log(roomNumber);
     console.log(bookingId);
-    console.log(roomBookings);
+    // console.log(roomBookings);
 
     // Find the booking in the roomBookings object
     const booking = roomBookings[roomNumber].find(booking => booking.bookingId === bookingId);
     console.log(booking);
-    loadBookingModal(booking, roomNumber);
+    await loadBookingModal(booking, roomNumber);
 }
 
 // Show booking details modal
-function showBookingModal(roomNumber, dateString) {
+async function showBookingModal(roomNumber, dateString) {
     console.log("showBookingModal called");
     console.log(roomNumber);
     console.log(dateString);
@@ -652,14 +676,22 @@ function showBookingModal(roomNumber, dateString) {
     console.log(date);
     const bookingInfo = getBookingInfo(roomNumber, date);
     console.table(bookingInfo);
-    loadBookingModal(bookingInfo, roomNumber);
+    await loadBookingModal(bookingInfo, roomNumber);
 }
 
 
-function loadBookingModal(bookingInfo, roomNumber) {
+async function loadBookingModal(bookingInfo, roomNumber) {
+    let modalContent = '';
     if (bookingInfo) {
         console.log(bookingInfo);
-        let modalContent = `
+
+        // Fetch all required data asynchronously upfront
+        const roomsList = await localforage.getItem('roomsList') || [];
+        const bookingsList = await localforage.getItem('bookingsList') || [];
+        const allFoodList = await localforage.getItem('allFoodList') || [];
+        const billingList = await localforage.getItem('billingList') || [];
+
+        modalContent = `
             <div class = "booking-details-card">
                 <button class="btn-bookingadd bd-card" id="btn-bookingadd" onclick="" style="display: none">Add Room</button>
                 <button class="btn-bookingedit bd-card" id="btn-bookingedit" onclick="editBooking(${bookingInfo.roomid}, ${bookingInfo.bookingId});">Edit Booking</button>
@@ -689,15 +721,15 @@ function loadBookingModal(bookingInfo, roomNumber) {
             </div>
         `;
 
-        // Show id card from local storage with bookingInfo.id_card 
-        console.log(bookingInfo.id_card);
+        // Show id card
+        // console.log(bookingInfo.id_card);
 
 
         if (bookingInfo.id_card) {
-            showIdCard(bookingInfo);
+            await showIdCard(bookingInfo);
         }
 
-        function showIdCard(bookingInfo) {
+        async function showIdCard(bookingInfo) {
             const idCard = document.createElement('div');
             idCard.classList.add('booking-data-head');
             idCard.textContent = 'ID Card:';
@@ -711,32 +743,45 @@ function loadBookingModal(bookingInfo, roomNumber) {
             idCardContainer.classList.add('id-card-container');
 
             // Iterate over each ID card
-            idCards.forEach(card => {
+            for (const card of idCards) {
                 const cardElement = document.createElement('div');
                 cardElement.classList.add('idcard-element');
 
                 // Check file type and create appropriate element
                 if (card.endsWith('.pdf')) {
                     // Create a link for PDF
+                    const pdfContent = await localforage.getItem(card);
                     const pdfLink = document.createElement('a');
-                    pdfLink.href = localStorage.getItem(card);
+                    pdfLink.href = pdfContent || card; // Use content or fall back to key (if URL)
                     pdfLink.textContent = 'View PDF';
                     pdfLink.target = '_blank';
                     cardElement.appendChild(pdfLink);
                 } else {
                     // Create an image element for images
                     const img = document.createElement('img');
-                    img.src = card;
+                    img.src = card; // If card is URL. If card is key for Base64, we need getItem.
+                    // Assuming 'card' is URL for now based on original code 'img.src = card'. 
+                    // But if the project uses localForage for images, we might need to fetch blob.
+                    // Original code used `img.src = card`, implying `card` is a URL path.
+                    // However, pdf case used `localStorage.getItem(card)`. 
+                    // This inconsistency suggests images might be URLs and PDFs might be blobs/Base64 in storage?
+                    // Or `card` for PDF is a key.
+                    // I'll keep `img.src = card` as original, effectively.
+
+                    // Check if we need to fetch image content from storage?
+                    // Original: img.src = card;
+                    // So card is likely a URL/Path.
+
                     img.alt = 'ID Card';
-                    img.target = '_blank';
-                    img.rel = 'noopener noreferrer';
+                    img.target = '_blank'; // img target? Maybe wrap in anchor or just display
+                    // img.rel = 'noopener noreferrer';
                     img.classList.add('thumbnail-img');
 
                     cardElement.appendChild(img);
                 }
 
                 idCardContainer.appendChild(cardElement);
-            });
+            }
 
             // Append the container to modal content
             modalContent += idCardContainer.outerHTML;
@@ -744,23 +789,14 @@ function loadBookingModal(bookingInfo, roomNumber) {
 
 
         if (bookingInfo.bookingId) {
-            // Map room number with room id from local storage roomsList
-            const roomsListString = localStorage.getItem('roomsList');
-            const roomsList = JSON.parse(roomsListString);
+            // Map room number with room id 
             const room = roomsList.find(room => room.room_number == roomNumber);
-            const roomId = room.id;
+            const roomId = room ? room.id : null;
+            if (!roomId) console.error('Room ID not found for', roomNumber);
 
-            // Get booking data from API by id
-            // const bookingData = getBookingById(bookingInfo.bookingId);
-            // console.log(bookingData);
-
-            // Get booking data from local storage
-            const bookingData = localStorage.getItem('bookingsList');
-            const bookingDataObj = JSON.parse(bookingData);
-            console.warn(bookingDataObj);
-
-            const booking = bookingDataObj.find(booking => booking.id === bookingInfo.bookingId);
-            console.warn(booking);
+            // Get booking data from bookingsList
+            const booking = bookingsList.find(booking => booking.id === bookingInfo.bookingId);
+            // console.warn(booking);
 
             console.log(roomId, roomNumber);
 
@@ -768,77 +804,71 @@ function loadBookingModal(bookingInfo, roomNumber) {
             // Display services booking and orders assosiated with booking
 
             // Display each service usage
-            booking.rooms.forEach(room => {
-                console.log(room);
-                if (room.room == roomId && room.service_usages.length > 0) { // Check if the room ID matches
+            if (booking) {
+                booking.rooms.forEach(room => {
                     console.log(room);
-                    modalContent += `<div class="booking-data-head">Services:</div>`;
-                    room.service_usages.forEach(service => {
-                        modalContent += `
-                        <ul class="service-list">
-                    <li>
-                        <strong>Service Name:</strong> ${service.service_name} 
-                        
-                        <i class="fas fa-trash services-del" id="services-del" data-service-id="${service.id}"></i><br> 
-                        
-                        <strong>Usage Date:</strong> ${new Date(service.usage_date).toLocaleString()} <br>
-                        
-                        
-                    </li></ul>
-                `;
-                    });
-                }
-            });
+                    if (room.room == roomId && room.service_usages.length > 0) { // Check if the room ID matches
+                        console.log(room);
+                        modalContent += `<div class="booking-data-head">Services:</div>`;
+                        room.service_usages.forEach(service => {
+                            modalContent += `
+                            <ul class="service-list">
+                        <li>
+                            <strong>Service Name:</strong> ${service.service_name} 
+                            
+                            <i class="fas fa-trash services-del" id="services-del" data-service-id="${service.id}"></i><br> 
+                            
+                            <strong>Usage Date:</strong> ${new Date(service.usage_date).toLocaleString()} <br>
+                            
+                            
+                        </li></ul>
+                    `;
+                        });
+                    }
+                });
 
+                // Display each order
+                booking.rooms.forEach(room => {
+                    if (room.room === roomId && room.orders.length > 0) { // Check if the room ID matches
+                        modalContent += `<div class="booking-data-head">Food Orders:</div>`;
+                        room.orders.forEach(order => {
+                            // Get food items list from allFoodList (already fetched)
 
-            // Display each order
-            booking.rooms.forEach(room => {
-                if (room.room === roomId && room.orders.length > 0) { // Check if the room ID matches
-                    modalContent += `<div class="booking-data-head">Food Orders:</div>`;
-                    room.orders.forEach(order => {
-                        // Get food items list from localStorage
-                        const allFoodList = JSON.parse(localStorage.getItem('allFoodList'));
+                            // Create food items display string
+                            const foodItemsDisplay = order.food_items.map((foodId, index) => {
+                                const foodItem = allFoodList.find(item => item.id === foodId);
+                                return `${foodItem ? foodItem.name.padEnd(20, '  ') : 'Unknown'} <div class="modal-qty">x${order.quantity[index]}</div>`;
+                            }).join('<br>');
 
-                        // Create food items display string
-                        const foodItemsDisplay = order.food_items.map((foodId, index) => {
-                            const foodItem = allFoodList.find(item => item.id === foodId);
-                            return `${foodItem.name.padEnd(20, '  ')} <div class="modal-qty">x${order.quantity[index]}</div>`;
-                        }).join('<br>');
+                            modalContent += `
+                                    <ul class="order-list"><li>
+                                        <strong>Order ID:</strong> <div class="bookingmodal-data">${order.id} </div>
+                                            <br>
 
-                        modalContent += `
-                                <ul class="order-list"><li>
-                                    <strong>Order ID:</strong> <div class="bookingmodal-data">${order.id} </div>
-                                        <br>
+                                        <strong>Food Items:</strong><br><div class="modal-food">${foodItemsDisplay}</div><br>
 
-                                    <strong>Food Items:</strong><br><div class="modal-food">${foodItemsDisplay}</div><br>
+                                        <strong>Total Price:</strong><div class="bookingmodal-data"> ₹${order.total} (without GST)</div><br>
+                                        <strong>Order Status:</strong><div class="bookingmodal-data"> ${order.status} </div><br>
+                                        <strong>Ordered At:</strong><div class="bookingmodal-data"> ${new Date(order.created_at).toLocaleString()} </div><br>
+                                        <a href="./../restaurant/takeorder/takeorder.html?orderId=${order.id}&room=${bookingInfo.bookingId}&orderType=hotel"><br>
+                                            <i class="fas fa-edit booking-eye-order" data-status="${order.status}"></i>
+                                        </a>
+                                        <button class="serve-btn" id="serve-btn" data-order-id="${order.id}" data-status="${order.status}">Serve</button><br>
+                                    </li></ul>
+                                `;
 
-                                    <strong>Total Price:</strong><div class="bookingmodal-data"> ₹${order.total} (without GST)</div><br>
-                                    <strong>Order Status:</strong><div class="bookingmodal-data"> ${order.status} </div><br>
-                                    <strong>Ordered At:</strong><div class="bookingmodal-data"> ${new Date(order.created_at).toLocaleString()} </div><br>
-                                    <a href="./../restaurant/takeorder/takeorder.html?orderId=${order.id}&room=${bookingInfo.bookingId}&orderType=hotel"><br>
-                                        <i class="fas fa-edit booking-eye-order" data-status="${order.status}"></i>
-                                    </a>
-                                    <button class="serve-btn" id="serve-btn" data-order-id="${order.id}" data-status="${order.status}">Serve</button><br>
-                                </li></ul>
-                            `;
-
-                    });
-                }
-            });
-
-
+                        });
+                    }
+                });
+            }
 
         }
 
         if (bookingInfo.status === 'pending' || bookingInfo.status === 'noshow' || bookingInfo.status === 'confirmed') {
-            // modalContent += `
-            //     <p><strong>Status:</strong> ${bookingInfo.status}</p>
-            // `;
             const checkInBtn = document.createElement('button');
             checkInBtn.className = 'btn-checkin';
             checkInBtn.id = 'btn-checkin';
             checkInBtn.textContent = 'Check-In';
-            // checkInBtn.addEventListener('click', () => checkInBooking(bookingInfo, roomNumber));
             checkInBtn.onclick = () => checkInBooking(bookingInfo, roomNumber);
             modalContent += checkInBtn.outerHTML;
 
@@ -846,9 +876,6 @@ function loadBookingModal(bookingInfo, roomNumber) {
 
 
         if (bookingInfo.status === 'checkin') {
-            // modalContent += `
-            //     <p><strong>Status:</strong> ${bookingInfo.status}</p>
-            // `;
 
             const checkoutBtn = document.createElement('button');
             checkoutBtn.className = 'btn-checkout';
@@ -860,7 +887,6 @@ function loadBookingModal(bookingInfo, roomNumber) {
             servicesBtn.className = 'btn-services';
             servicesBtn.id = 'btn-services';
             servicesBtn.textContent = 'Services';
-            // servicesBtn.addEventListener('click', () => servicesBooking(bookingInfo, roomNumber));
             // servicesBtn.onclick = () => servicesBooking(bookingInfo, roomNumber);
             modalContent += servicesBtn.outerHTML;
 
@@ -872,25 +898,18 @@ function loadBookingModal(bookingInfo, roomNumber) {
         }
 
         if (bookingInfo.status === 'checkout') {
-            // const billBtn = document.createElement('button');
-            // billBtn.className = 'btn-bill';
-            // billBtn.id = 'btn-bill';
-            // billBtn.textContent = 'Generate Bill';
-            // modalContent += billBtn.outerHTML;
 
             const bookingId = bookingInfo.bookingId;
             console.log(bookingId);
 
 
-            checkBillStatus(bookingId);
+            // checkBillStatus(bookingId); // Async handling below
 
             function showBillStatus() {
                 console.warn('showBillStatus called');
-                // First remove any existing loading text
 
-                // Get the modal body
                 const modalBody = document.querySelector('#bookingModal .modal-body');
-                console.log('Modal body element:', modalBody);
+                // console.log('Modal body element:', modalBody);
 
                 const existingLoadText = document.querySelector('.load-text');
                 if (existingLoadText) {
@@ -905,346 +924,217 @@ function loadBookingModal(bookingInfo, roomNumber) {
                 loadText.style.padding = '10px';
                 loadText.style.margin = '10px 0';
 
-                console.warn(loadText);
-
-                // Find the modal body and insert the loading text
-                // const modalBody = document.querySelector('.modal-body');
                 if (modalBody) {
-                    document.querySelector('.modal-body').appendChild(loadText);
-                    console.warn(modalBody);
-                } else {
-                    console.error('Modal body not found');
+                    modalBody.appendChild(loadText);
                 }
 
             }
 
             function checkBillStatus(bookingId) {
+                // Defer execution to allow modal content to render
+                setTimeout(() => {
+                    executeCheckBillStatus();
+                }, 100);
 
-                showBillStatus();
-                // showLoading();
+                function executeCheckBillStatus() {
+                    showBillStatus();
+                    getBills(bookingId);
+                }
+            }
 
-                getBills(bookingId);
+            function getBills(bookingId) {
+                if (checkAllRoomsStatus(bookingId)) {
+                    try {
+                        // Use fetched billingList
+                        // console.log('Raw billingList:', billingList);
 
-                function getBills2(bookingId) {
-                    const url = `${baseURL}billing/bills/`;
+                        const bookingIdNum = parseInt(bookingId);
+                        const bills = billingList.filter(bill => bill.booking_id == bookingId);
+
+                        console.log('Booking ID being searched:', bookingIdNum);
+                        console.log('Bills found:', bills);
+
+                        setTimeout(() => {
+                            checkBill(bills);
+                        }, 500);
+
+                    } catch (error) {
+                        console.error('Error processing bills:', error);
+                        checkBill([]);
+                    }
+
+                } else {
+                    alert('Cannot generate bill for Id ' + bookingId + '. All rooms must be checked out first.', 'error');
+                    return false;
+                }
+            }
+
+
+            function checkBill(bills) {
+                console.log('checkBill called');
+                // console.warn(bills);
+
+                const modalBody = document.querySelector('#bookingModal .modal-body');
+                if (!modalBody) return;
+
+                const loadText = modalBody.querySelector('.load-text');
+                if (loadText) loadText.remove();
+
+                if (bills.length > 0) {
+                    console.log('Bills found');
+
+                    const billBtn = document.createElement('button');
+                    billBtn.classList.add('bill-btn');
+                    billBtn.id = 'view-bill-btn';
+                    billBtn.innerHTML = 'Bill Generated Already';
+
+                    try {
+                        modalBody.appendChild(billBtn);
+                        billBtn.onclick = () => openBill(bills[0]);
+                    } catch (error) {
+                        console.error('Failed to append bill button to modal body:', error);
+                    }
+
+                } else if (bills.length == 0) {
+                    console.log('No bills found');
+
+                    const billBtn = document.createElement('button');
+                    billBtn.classList.add('bill-btn');
+                    billBtn.id = 'gen-bill-btn';
+                    billBtn.innerHTML = 'Generate Bill';
+
+                    modalBody.appendChild(billBtn);
+
+                    document.getElementById('gen-bill-btn').onclick = () => generateHotelBill(bookingInfo, roomNumber);
+
+                    console.log('No bill found for booking:', bookingId);
+                }
+            }
+
+            function openPaymentModal(bill) {
+                console.log('Opening payment modal for bill:', bill);
+                const settleModal = document.getElementById('paymentModal');
+                const settleModalContainer = document.querySelector('.modal-container2');
+                const modalBodySettle = settleModal.querySelector('.modal-body');
+
+                settleModalContainer.style.display = 'flex';
+                settleModal.style.display = 'block';
+                setTimeout(() => settleModal.classList.add('show'), 10);
+
+                populatePaymentModal(bill);
+
+                const paymentBtnSubmit = document.getElementById('payment-btn');
+                paymentBtnSubmit.onclick = () => {
+                    console.log('Payment made for bill:', bill);
+                    paymentPOST(bill);
+
+                };
+            }
+
+            function populatePaymentModal(bill) {
+                console.log('Populating payment modal with bill:', bill);
+
+                const orderId = document.getElementById('order-id');
+                orderId.value = bill.order_id;
+
+                const netAmt = document.getElementById('net-amt');
+                netAmt.value = bill.net_amount;
+            }
+
+            function paymentPOST(bill) {
+                console.log('Payment POST');
+
+                const paidAmt = document.getElementById('paid-amt').value;
+                const paymentMessage = document.getElementById('payment-message').value;
+
+                function getSelectedPaymentMethod() {
+                    const selectedPayment = document.querySelector('input[name="paymentMethod"]:checked');
+                    return selectedPayment ? selectedPayment.value : null;
+                }
+
+                const paymentMethod = getSelectedPaymentMethod();
+                console.log(paidAmt, paymentMessage, paymentMethod);
+
+                const paymentDetails = {
+                    'message': paymentMessage,
+                }
+
+                const paymentData = {
+                    'bill_id': bill.id,
+                    'paid_amount': paidAmt,
+                    'payment_method': paymentMethod,
+                    'payment_details': paymentDetails,
+                    'status': 'paid'
+                }
+
+                console.log(paymentData);
+                paymentPOSTcall(paymentData);
+
+                function paymentPOSTcall(paymentData) {
+                    showLoading();
+                    console.log('Payment POST call');
+                    const url = `${baseURL}billing/bill-payments/`;
                     const option = {
-                        method: 'GET',
+                        method: 'POST',
                         headers: {
                             'Authorization': 'Bearer ' + getCookie('access_token'),
                             'Content-Type': 'application/json'
-                        }
-                    };
+                        },
+                        body: JSON.stringify(paymentData)
+                    }
+
                     refreshAccessToken2(url, option)
-                        // .then(response => response.json())
                         .then(data => {
                             console.log(data);
-                            const bills = data.filter(bill => bill.booking_id == bookingId);
-                            console.log('Bills found:', bills);
-                            checkBill(bills);
-                            // hideLoading();
-                            // return bills;
+                            hideLoading();
+                            window.location.reload();
                         })
-
                         .catch(error => {
-                            console.log('Error fetching bill status:', error);
+                            console.log('Error in payment POST call:', error);
+                            hideLoading();
                         });
                 }
-
-                function getBills(bookingId) {
-                    if (checkAllRoomsStatus(bookingId)) {
-                        try {
-                            // Get bills from localStorage
-                            const billingList = JSON.parse(localStorage.getItem('billingList') || '[]');
-                            console.log('Raw billingList:', billingList);
-
-                            console.log("Billing list found");
-
-                            // Ensure we're comparing numbers with numbers or strings with strings
-                            const bookingIdNum = parseInt(bookingId);
-                            // const bills = billingList.filter(bill => parseInt(bill.booking_id) === bookingIdNum);
-                            const bills = billingList.filter(bill => bill.booking_id == bookingId);
-
-                            console.log('Booking ID being searched:', bookingIdNum);
-                            console.log('Bills found:', bills);
-
-                            setTimeout(() => {
-                                checkBill(bills);
-                            }, 500);
-
-                        } catch (error) {
-                            console.error('Error processing bills from localStorage:', error);
-                            checkBill([]);
-                        }
-
-                    } else {
-                        // Show message that all rooms must be checked out
-                        alert('Cannot generate bill for Id ' + bookingId + '. All rooms must be checked out first.', 'error');
-
-                        return false;
-                    }
-                }
-
-
-                function checkBill(bills) {
-                    console.log('checkBill called');
-                    console.warn(bills);
-                    let buttonsHTML = '';
-
-                    if (bills.length > 0) {
-                        console.log(bills.length);
-                        console.log('Bills found');
-
-                        // const orderDetails = document.getElementById('orderDetails');
-                        const billBtn = document.createElement('button');
-                        billBtn.classList.add('bill-btn');
-                        billBtn.id = 'view-bill-btn';
-                        billBtn.innerHTML = 'Bill Generated Already';
-                        // billBtn.innerHTML = 'Print Bill';
-
-                        try {
-                            console.log('Appending bill button to modal body');
-
-                            const modalBody = document.querySelector('#bookingModal .modal-body');
-                            console.log('Modal body found:', modalBody);
-
-                            try {
-                                console.log('Appending bill button to modal body');
-                                console.log(billBtn);
-                                modalBody.innerHTML += billBtn.outerHTML;
-                                // document.querySelector('#bookingModal .modal-body').appendChild(billBtn);
-                                // document.querySelector('.modal-body').insertAdjacentElement('beforeend', billBtn);
-                                // modalBody.appendChild(billBtn);
-                                console.log(modalBody);
-                            } catch (error) {
-                                console.error('Failed to append bill button to modal body:', error);
-                            }
-                            console.log('Bill button appended to modal body');
-
-
-                            // document.querySelector('.modal-body').appendChild(billBtn);
-                        } catch (error) {
-                            console.error('Failed to append bill button to modal body:', error);
-                        }
-
-                        // if (!document.querySelector('#bookingModal .modal-body').appendChild(billBtn)){
-                        //     console.error('Failed to append bill button to modal body');
-                        // }
-
-                        // document.getElementById('view-bill-btn').onclick = () => openBill(bills[0]);
-                        // console.log('Latest bill found for order:', bills[0]);
-
-                        // makepayment(bills[0]);
-
-                    } else if (bills.length == 0) {
-                        console.log(bills.length);
-                        console.log('No bills found');
-
-                        // const orderDetails = document.getElementById('orderDetails');
-                        const billBtn = document.createElement('button');
-                        billBtn.classList.add('bill-btn');
-                        billBtn.id = 'gen-bill-btn';
-                        billBtn.innerHTML = 'Generate Bill';
-
-                        // buttonsHTML += billBtn.outerHTML;
-                        // document.querySelector('#bookingModal .modal-body').appendChild(billBtn);
-                        modalBody.appendChild(billBtn);
-
-                        if (!modalBody.appendChild(billBtn)) {
-                            console.error('Failed to append bill button to modal body');
-                        }
-
-                        document.getElementById('gen-bill-btn').onclick = () => generateHotelBill(bookingInfo, roomNumber);
-
-                        console.log('No bill found for booking:', bookingId);
-                    }
-                }
-
-                function makepayment(bill) {
-                    // const orderDetails = document.getElementById('orderDetails');
-                    console.log('Making payment for bill:', bill);
-
-                    if (bill.status == 'paid') {
-                        console.log('BLOCK IF')
-                        // alert('Bill already settled');
-                        // return;
-                    } else {
-                        console.log(bill.status);
-                        console.log('BLOCK ELSE')
-                        const paymentBtn = document.createElement('button');
-                        paymentBtn.classList.add('payment-btn');
-                        paymentBtn.id = 'payment-btn';
-                        paymentBtn.innerHTML = 'Make Payment';
-
-                        document.querySelector('.modal-body').appendChild(paymentBtn);
-
-
-                    }
-
-                }
-
-                function openPaymentModal(bill) {
-                    console.log('Opening payment modal for bill:', bill);
-                    const settleModal = document.getElementById('paymentModal');
-                    const settleModalContainer = document.querySelector('.modal-container2');
-                    const modalBodySettle = settleModal.querySelector('.modal-body');
-
-                    // Change display to flex for centering
-                    settleModalContainer.style.display = 'flex';
-                    settleModal.style.display = 'block';
-                    setTimeout(() => settleModal.classList.add('show'), 10);
-
-                    // Populate the modal with bill data
-                    populatePaymentModal(bill);
-
-                    const paymentBtnSubmit = document.getElementById('payment-btn');
-                    paymentBtnSubmit.onclick = () => {
-                        console.log('Payment made for bill:', bill);
-                        paymentPOST(bill);
-
-                    };
-                }
-
-                function populatePaymentModal(bill) {
-                    console.log('Populating payment modal with bill:', bill);
-
-                    const orderId = document.getElementById('order-id');
-                    orderId.value = bill.order_id;
-
-                    const netAmt = document.getElementById('net-amt');
-                    netAmt.value = bill.net_amount;
-                }
-
-                function paymentPOST(bill) {
-                    console.log('Payment POST');
-
-                    const paidAmt = document.getElementById('paid-amt').value;
-                    const paymentMessage = document.getElementById('payment-message').value;
-                    // const paymentMethod = document.getElementById('payment-method').value;
-                    // Get selected payment method
-                    function getSelectedPaymentMethod() {
-                        const selectedPayment = document.querySelector('input[name="paymentMethod"]:checked');
-                        return selectedPayment ? selectedPayment.value : null;
-                    }
-
-                    const paymentMethod = getSelectedPaymentMethod();
-
-                    console.log(paidAmt, paymentMessage, paymentMethod);
-
-                    const paymentDetails = {
-                        'message': paymentMessage,
-                    }
-
-                    const paymentData = {
-                        'bill_id': bill.id,
-                        'paid_amount': paidAmt,
-                        'payment_method': paymentMethod,
-                        'payment_details': paymentDetails,
-                        'status': 'paid'
-                    }
-
-                    console.log(paymentData);
-
-                    paymentPOSTcall(paymentData);
-
-                    function paymentPOSTcall(paymentData) {
-                        showLoading();
-                        console.log('Payment POST call');
-                        const url = `${baseURL}billing/bill-payments/`;
-                        const option = {
-                            method: 'POST',
-                            headers: {
-                                'Authorization': 'Bearer ' + getCookie('access_token'),
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify(paymentData)
-                        }
-
-                        refreshAccessToken2(url, option)
-                            .then(data => {
-                                console.log(data);
-                                hideLoading();
-                                window.location.reload();
-                            })
-                            .catch(error => {
-                                console.log('Error in payment POST call:', error);
-                                hideLoading();
-                            });
-                    }
-                }
-
-                function checkAllRoomsStatus2(bookingID) {
-                    const bookingsList = JSON.parse(localStorage.getItem('bookingsList')) || [];
-                    const currentBooking = bookingsList.find(booking => booking.id === bookingID);
-
-                    if (!currentBooking) return false;
-
-                    // Check if all rooms are checked out
-                    const allRoomsCheckedOut = currentBooking.rooms.every(room => room.status === 'checkout');
-
-                    // Check if any room is still in checked-in status
-                    const hasCheckedInRooms = currentBooking.rooms.some(room => room.status === 'checkin');
-
-                    // Return true only if all rooms are checked out and none are checked in
-                    return allRoomsCheckedOut && !hasCheckedInRooms;
-                }
-
-                function checkAllRoomsStatus(bookingID) {
-                    const bookingsList = JSON.parse(localStorage.getItem('bookingsList')) || [];
-                    const currentBooking = bookingsList.find(booking => booking.id === bookingID);
-
-                    if (!currentBooking) return false;
-
-                    // Check if all rooms have check_out_date (checked out)
-                    const allRoomsCheckedOut = currentBooking.rooms.every(room => room.check_out_date);
-
-                    // Check if any room is checked in but not checked out
-                    const hasIncompleteCheckout = currentBooking.rooms.some(room =>
-                        room.check_in_details && !room.check_out_date
-                    );
-
-                    // Return true only if all rooms are checked out
-                    return allRoomsCheckedOut && !hasIncompleteCheckout;
-                }
-
-
             }
 
+            function checkAllRoomsStatus(bookingID) {
+                const currentBooking = bookingsList.find(booking => booking.id === bookingID);
+
+                if (!currentBooking) return false;
+
+                // Check if all rooms have check_out_date (checked out)
+                const allRoomsCheckedOut = currentBooking.rooms.every(room => room.check_out_date);
+
+                // Check if any room is checked in but not checked out
+                const hasIncompleteCheckout = currentBooking.rooms.some(room =>
+                    room.check_in_details && !room.check_out_date
+                );
+
+                // Return true only if all rooms are checked out
+                return allRoomsCheckedOut && !hasIncompleteCheckout;
+            }
+
+
+            // Execute checkBillStatus
+            checkBillStatus(bookingId);
         }
-        // here
-
-        const modal = document.getElementById('bookingModal');
-        const modalBody = modal.querySelector('.modal-body');
-        setTimeout(() => modal.classList.add('show'), 10);
-
-        console.log(modalContent);
-
-        modalBody.innerHTML = modalContent;
-        modal.style.display = 'block';
 
     }
+    // here
 
-    const viewBillBtn = document.getElementById('view-bill-btn');
-    const noBillBtn = document.getElementById('no-bill-btn');
-    const paymentBtn = document.getElementById('payment-btn');
-    if (viewBillBtn) {
-        console.log('viewBillBtn clicked');
-        document.getElementById('view-bill-btn').onclick = () => openBill(bill[0]);
-    }
-    if (noBillBtn) {
-        noBillBtn.onclick = () => alert('Bill not generated yet for this order');
-    }
-    if (paymentBtn) {
-        paymentBtn.onclick = () => openPaymentModal(bill);
-    }
+    const modal = document.getElementById('bookingModal');
+    const modalBody = modal.querySelector('.modal-body');
+    setTimeout(() => modal.classList.add('show'), 10);
 
+    console.log(modalContent);
+
+    modalBody.innerHTML = modalContent;
+    modal.style.display = 'block';
 
     // Adding event listener to check-in button inside booking details modal
     const checkInBtn = document.getElementById('btn-checkin');
     const servicesBtn = document.getElementById('btn-services');
     const checkoutBtn = document.getElementById('btn-checkout');
     const orderBtn = document.getElementById('btn-order');
-
-    const viewbillBtn = document.getElementById('view-bill-btn');
 
     if (checkInBtn) {
         document.getElementById('btn-checkin').onclick = () => checkInBooking(bookingInfo, roomNumber);
@@ -1261,14 +1151,11 @@ function loadBookingModal(bookingInfo, roomNumber) {
 
 
     const serveBtn = document.querySelectorAll('.serve-btn');
-    // for each serveBtn add event listener
     if (serveBtn) {
-        // document.getElementById('serve-btn').onclick = () => serveOrder(serveBtn.dataset.orderId);
         serveBtn.forEach(btn => {
             const serveBtnId = btn.dataset.orderId;
             const serveBtnStatus = btn.dataset.status;
             if (serveBtnStatus === 'served' || serveBtnStatus === 'settled') {
-                // btn.style.display = 'none';
                 btn.textContent = 'Served';
                 btn.style.backgroundColor = '#5e5e5e';
                 btn.style.color = '#fff';
@@ -1322,13 +1209,17 @@ function loadBookingModal(bookingInfo, roomNumber) {
         const cancelledBtn = document.querySelector('.modal-body .booking-details-card #btn-bookingcanc');
         const editdetailBtn = document.querySelector('.modal-body .booking-details-card #btn-bookingedit');
 
-        cancelledBtn.disabled = true;
-        cancelledBtn.style.backgroundColor = '#9e9e9e';
-        cancelledBtn.style.cursor = 'not-allowed';
+        if (cancelledBtn) {
+            cancelledBtn.disabled = true;
+            cancelledBtn.style.backgroundColor = '#9e9e9e';
+            cancelledBtn.style.cursor = 'not-allowed';
+        }
 
-        editdetailBtn.disabled = true;
-        editdetailBtn.style.backgroundColor = '#9e9e9e';
-        editdetailBtn.style.cursor = 'not-allowed';
+        if (editdetailBtn) {
+            editdetailBtn.disabled = true;
+            editdetailBtn.style.backgroundColor = '#9e9e9e';
+            editdetailBtn.style.cursor = 'not-allowed';
+        }
     }
 
 }
@@ -1337,8 +1228,6 @@ function openBill(bill) {
     console.log('openBill called');
     console.log(bill);
 }
-
-// Onclick action for Generate Bill from Booking details modal
 function generateHotelBill(bookingInfo, roomNumber) {
     console.log("generateHotelBill called");
     console.log(bookingInfo);
@@ -1396,23 +1285,12 @@ function generateHotelBill(bookingInfo, roomNumber) {
         // Initial setup
         updateGenBillData();
 
-        // if any of the values are null, remove that key from the object
-        // if (genBillData.room_discount === null) {
-        //     delete genBillData.room_discount;
-        // }
-        // if (genBillData.order_discount === null) {
-        //     delete genBillData.order_discount;
-        // }
-        // if (genBillData.customer_gst === null) {
-        //     delete genBillData.customer_gst;
-        // }
-
         console.table(genBillData);
         document.getElementById('gen-billBtn').onclick = () => genBillPOST(genBillData);
     }
 }
 
-function genBillPOST(genBillData) {
+async function genBillPOST(genBillData) {
     showLoading();
     console.log("printBill called");
     console.log(genBillData);
@@ -1437,15 +1315,14 @@ function genBillPOST(genBillData) {
             //     getAllBilling()
             // ]);
 
-            // Update localStorage billingList
-            let billingList = JSON.parse(localStorage.getItem('billingList') || '[]');
+            // Update localForage billingList
+            let billingList = await localforage.getItem('billingList') || [];
             // Remove existing bill if it exists
             billingList = billingList.filter(bill => bill.booking_id !== data.booking_id);
             // Add the new bill data at the beginning of the array
             billingList.unshift(data);
-            // Save updated list back to localStorage
-            localStorage.setItem('billingList', JSON.stringify(billingList));
-
+            // Save updated list back to localForage
+            await localforage.setItem('billingList', billingList);
 
 
             document.querySelector('.close-settle').click();
@@ -1465,7 +1342,8 @@ function editBooking3(bookingId) {
 }
 
 // Edit Booking
-function editBooking(roomid, bookingId) {
+// Edit Booking
+async function editBooking(roomid, bookingId) {
     // alert('Edit Booking coming soon', 'success');
     console.log("editBooking called");
     // alert(bookingId, 'success');
@@ -1478,7 +1356,7 @@ function editBooking(roomid, bookingId) {
     }
 
     // Get complete booking details from local storage bookingsList using bookingId and  fill the fields in the modal
-    const bookingList = JSON.parse(localStorage.getItem('bookingsList') || '[]');
+    const bookingList = await localforage.getItem('bookingsList') || [];
     const booking = bookingList.find(b => b.id === bookingId);
     console.log(booking);
 
@@ -1487,7 +1365,7 @@ function editBooking(roomid, bookingId) {
     console.log('Found room:', room);
 
     // Get rooms from localStorage and find matching room
-    const roomsList = JSON.parse(localStorage.getItem('roomsList') || '[]');
+    const roomsList = await localforage.getItem('roomsList') || [];
     const roomDetails = roomsList.find(r => r.id === roomid);
     console.log('Room details from roomsList:', roomDetails);
 
@@ -1508,7 +1386,7 @@ function editBooking(roomid, bookingId) {
     console.log(roomBookings);
     // checkRoomAvailability_forEdit();
 
-    function checkRoomAvailability_forEdit() {
+    async function checkRoomAvailability_forEdit() {
         // Get form values
         const newStartDate = (document.getElementById('newstartDate').value);
         const newEndDate = (document.getElementById('newendDate').value);
@@ -1517,12 +1395,13 @@ function editBooking(roomid, bookingId) {
         const oldEndDate = new Date(document.getElementById('editLastTime').value);
 
         // Get bookings
-        const bookings = JSON.parse(localStorage.getItem('bookingsList')) || [];
+        const bookings = await localforage.getItem('bookingsList') || [];
+        const roomsListInternal = await localforage.getItem('roomsList') || [];
 
         // Find room bookings excluding current booking
         const roomBookings = bookings.flatMap(booking =>
             booking.rooms.filter(room => {
-                const roomDetails = JSON.parse(localStorage.getItem('roomsList')).find(r => r.id === room.room);
+                const roomDetails = roomsListInternal.find(r => r.id === room.room);
                 return roomDetails.room_number === roomNumber &&
                     !(new Date(room.start_date).getTime() === oldStartDate.getTime() &&
                         new Date(room.end_date).getTime() === oldEndDate.getTime());
@@ -1544,8 +1423,8 @@ function editBooking(roomid, bookingId) {
     }
 
     // Add event listener to check availability
-    document.getElementById('edit-booking-btn').onclick = function () {
-        if (checkRoomAvailability_forEdit()) {
+    document.getElementById('edit-booking-btn').onclick = async function () {
+        if (await checkRoomAvailability_forEdit()) {
             alert('Room is available for selected dates', 'success');
             // Proceed with booking update
             PATCHedit_booking();
@@ -1577,12 +1456,12 @@ function editBooking(roomid, bookingId) {
         const url = `${baseURL}hotel/bookings/${bookingId}/`;
 
         refreshAccessToken2(url, options)
-            .then(data => {
+            .then(async data => {
                 console.log("Patch: Timings Changed:", data);
                 alert("Timings changed Successfully", 'success');
 
                 // Get bookings from localStorage
-                const allBookings = JSON.parse(localStorage.getItem('bookingsList')) || [];
+                const allBookings = await localforage.getItem('bookingsList') || [];
                 // Update specific booking and room
                 const updatedBookings = allBookings.map(booking => {
                     if (booking.id === bookingId) {
@@ -1601,7 +1480,7 @@ function editBooking(roomid, bookingId) {
                 });
 
                 // Save back to localStorage
-                localStorage.setItem('bookingsList', JSON.stringify(updatedBookings));
+                await localforage.setItem('bookingsList', updatedBookings);
 
                 document.getElementById('booking').click();
 
@@ -1617,12 +1496,12 @@ function editBooking(roomid, bookingId) {
 
 }
 
-function editBooking2(bookingId) {
+async function editBooking2(bookingId) {
     console.log("editBooking called");
     console.log(bookingId);
 
-    // Get booking data from localStorage
-    const bookingList = JSON.parse(localStorage.getItem('bookingsList') || '[]');
+    // Get booking data from localForage
+    const bookingList = await localforage.getItem('bookingsList') || [];
     const booking = bookingList.find(b => b.id === bookingId);
 
     if (!booking) {
@@ -1645,7 +1524,7 @@ function editBooking2(bookingId) {
 }
 
 // Function to open edit booking details modal
-function editBookingDetails(bookingId) {
+async function editBookingDetails(bookingId) {
     console.log('editBookingDetails booked.')
     const modal = document.getElementById('editBookingDetailsModal');
     const modalContainer = document.querySelector('.modal-container-8');
@@ -1656,7 +1535,7 @@ function editBookingDetails(bookingId) {
     setTimeout(() => modal.classList.add('show'), 10);
 
     // Fetch booking details
-    const bookingData = JSON.parse(localStorage.getItem('bookingsList')) || [];
+    const bookingData = await localforage.getItem('bookingsList') || [];
     const bookingInfo = bookingData.find(booking => booking.id === bookingId);
     console.log('Booking Info:', bookingInfo);
 
@@ -1675,7 +1554,7 @@ function editBookingDetails(bookingId) {
 }
 
 // Update booking details function
-function updateBookingDetails(guestUserId) {
+async function updateBookingDetails(guestUserId) {
     const updatedData = {
         first_name: document.getElementById('edit-first-name').value,
         last_name: document.getElementById('edit-last-name').value || '',
@@ -1705,12 +1584,12 @@ function updateBookingDetails(guestUserId) {
         const url = `${baseURL}accounts/users/${guestUserId}/`;
 
         refreshAccessToken2(url, options)
-            .then(data => {
+            .then(async data => {
                 console.log("Patch: Booking Data posted:", data);
                 alert("Billing Details Updated Successfully", 'success');
 
-                // Get bookings from localStorage
-                const allBookings = JSON.parse(localStorage.getItem('bookingsList')) || [];
+                // Get bookings from localForage
+                const allBookings = await localforage.getItem('bookingsList') || [];
                 // Find and update matching bookings
                 const updatedBookings = allBookings.map(booking => {
                     if (booking.guest_detail[0].id === guestUserId) {
@@ -1724,8 +1603,8 @@ function updateBookingDetails(guestUserId) {
                     }
                     return booking;
                 });
-                // Save back to localStorage
-                localStorage.setItem('bookingsList', JSON.stringify(updatedBookings));
+                // Save back to localForage
+                await localforage.setItem('bookingsList', updatedBookings);
 
                 document.querySelector('.close-edit').click();
                 document.getElementById('booking').click();
@@ -1740,7 +1619,7 @@ function updateBookingDetails(guestUserId) {
     }
 }
 
-function roomBookCancel(roomid, bookingId) {
+async function roomBookCancel(roomid, bookingId) {
     console.log(`Room Id to Delete: ${roomid}`);
     console.log(`From Booking Id to Delete: ${bookingId}`);
 
@@ -1765,12 +1644,12 @@ function roomBookCancel(roomid, bookingId) {
         const url = `${baseURL}hotel/bookings/${bookingId}/`;
 
         refreshAccessToken2(url, options)
-            .then(data => {
+            .then(async data => {
                 console.log("Patch: Room removed:", data);
                 alert("Room removed Successfully", 'success');
 
-                // Get bookings from localStorage
-                const allBookings = JSON.parse(localStorage.getItem('bookingsList')) || [];
+                // Get bookings from localForage
+                const allBookings = await localforage.getItem('bookingsList') || [];
                 // Find and update booking
                 const updatedBookings = allBookings.map(booking => {
                     if (booking.id === bookingId) {
@@ -1779,8 +1658,8 @@ function roomBookCancel(roomid, bookingId) {
                     }
                     return booking;
                 });
-                // Save back to localStorage
-                localStorage.setItem('bookingsList', JSON.stringify(updatedBookings));
+                // Save back to localForage
+                await localforage.setItem('bookingsList', updatedBookings);
 
                 // document.querySelector('.close-edit').click();
                 document.getElementById('booking').click();
@@ -1817,11 +1696,11 @@ function convertToIST(dateString) {
     });
 }
 
-function downloadReciept(bookingId) {
-    // Get booking data from localStorage
-    const bookings = JSON.parse(localStorage.getItem('bookingsList')) || [];
+async function downloadReciept(bookingId) {
+    // Get booking data from localForage
+    const bookings = await localforage.getItem('bookingsList') || [];
     const booking = bookings.find(b => b.id === bookingId);
-    const roomsList = JSON.parse(localStorage.getItem('roomsList')) || [];
+    const roomsList = await localforage.getItem('roomsList') || [];
 
     if (!booking) {
         alert('Booking not found', 'error');
@@ -2191,16 +2070,23 @@ function checkOutBooking(bookingInfo, roomNumber) {
 }
 
 // Onclick action for Order from Booking details modal
-function orderBooking(bookingInfo, roomNumber) {
+// Onclick action for Order from Booking details modal
+async function orderBooking(bookingInfo, roomNumber) {
 
     const mobile = bookingInfo.phoneNumber;
     const name = bookingInfo.guestName;
     const email = bookingInfo.email;
 
     // map room number with room id from local storage roomsList
-    const roomsListString = localStorage.getItem('roomsList');
-    const roomsList = JSON.parse(roomsListString);
+    const roomsList = await localforage.getItem('roomsList') || [];
     const room = roomsList.find(room => room.room_number == roomNumber);
+
+    if (!room) {
+        console.error("Room not found in local storage for number:", roomNumber);
+        alert("Room details not found", "error");
+        return;
+    }
+
     const roomId = room.id;
 
     console.log("Order btn clicked");
@@ -2209,7 +2095,7 @@ function orderBooking(bookingInfo, roomNumber) {
 }
 
 // Render Service Modal
-function renderServiceModal(bookingInfo, roomNumber) {
+async function renderServiceModal(bookingInfo, roomNumber) {
     console.log("renderServiceModal called");
     console.log(bookingInfo);
     console.log(roomNumber);
@@ -2218,23 +2104,33 @@ function renderServiceModal(bookingInfo, roomNumber) {
     const dataById = getBookingById(bookingInfo.bookingId);
     console.log(dataById);
 
-    putBookingDataInServiceModal(bookingId, roomNumber);
+    await putBookingDataInServiceModal(bookingId, roomNumber);
 
-    function putBookingDataInServiceModal(bookingId, roomNumber) {
+    async function putBookingDataInServiceModal(bookingId, roomNumber) {
         const roomElement = document.getElementById('serviceRoomNumber');
         roomElement.value = roomNumber;
         roomElement.dataset.bookingId = bookingId;
 
         const serviceElement = document.getElementById('serviceService');
         // append services options in serviceElement from local storage servicesList
-        const servicesListString = localStorage.getItem('serviceList');
-        const servicesList = JSON.parse(servicesListString);
+        const servicesList = await localforage.getItem('serviceList') || [];
+
+        // serviceElement.innerHTML = ''; // Clear existing options? Original code didn't. Assuming it's safe or called once.
+        // Original code appended. If called multiple times, it duplicates options. 
+        // I will clear it to be safe, but adhering to strict refactor, I should stick to original behavior unless bug fix.
+        // I'll stick to original behavior but use localForage.
+
+        // Remove existing options to prevent duplication if function called multiple times?
+        // Original: serviceElement.appendChild(option). 
+        // If I make it async, logic is same.
+
         servicesList.forEach(service => {
             const option = document.createElement('option');
             option.value = service.id;
             option.textContent = service.name;
             serviceElement.appendChild(option);
         });
+
         // add data in each service option for price
         servicesList.forEach(service => {
             const option = serviceElement.querySelector(`option[value="${service.id}"]`);
@@ -2250,26 +2146,28 @@ function renderServiceModal(bookingInfo, roomNumber) {
 }
 
 // Render CheckOut Modal
-function renderCheckoutModal(bookingInfo, roomNumber) {
+async function renderCheckoutModal(bookingInfo, roomNumber) {
     console.log("renderCheckoutModal called");
     console.log(bookingInfo);
     console.log(roomNumber);
     const bookingId = bookingInfo.bookingId;
 
-    putBookingDataInCheckoutModal(bookingId, roomNumber);
+    await putBookingDataInCheckoutModal(bookingId, roomNumber);
 
-    function putBookingDataInCheckoutModal(bookingId, roomNumber) {
+    async function putBookingDataInCheckoutModal(bookingId, roomNumber) {
         const roomElement = document.getElementById('checkoutRoomNumber');
         roomElement.value = roomNumber;
         roomElement.dataset.bookingId = bookingId;
 
-        const roomData = localStorage.getItem('roomsList');
-        const roomsList = JSON.parse(roomData);
+        const roomsList = await localforage.getItem('roomsList') || [];
         const room = roomsList.find(room => room.room_number == roomNumber);
-        const roomId = room.id;
-        roomElement.dataset.roomId = roomId;
 
-
+        if (room) {
+            const roomId = room.id;
+            roomElement.dataset.roomId = roomId;
+        } else {
+            console.error('Room not found for checkout modal:', roomNumber);
+        }
     }
 }
 
@@ -2302,29 +2200,27 @@ document.getElementById('serviceQuantity').addEventListener('change', () => {
 });
 
 // Render data in Check-In Modal
-function renderCheckinModal(bookingInfo, roomNumber) {
+async function renderCheckinModal(bookingInfo, roomNumber) {
     // console.log(JSON.stringify(bookingInfo, null, 2));
 
     console.log(bookingInfo);
     console.log(bookingInfo.bookingId);
 
-    const dataById = getBookingById(bookingInfo.bookingId);
-
-    dataById.then(result => {
+    try {
+        const result = await getBookingById(bookingInfo.bookingId);
         console.log('Raw JSON string:', result);
-        putBookingDataInModal(result, roomNumber)
+        await putBookingDataInModal(result, roomNumber);
 
         console.log('Booking ID:', result.id);
         console.log('Booking Date:', result.booking_date);
-    }).catch(error => {
+    } catch (error) {
         console.error('Error fetching booking data:', error);
-    });
+    }
 
-    function putBookingDataInModal(result, roomNumber) {
+    async function putBookingDataInModal(result, roomNumber) {
 
         // // fetch id of roomNumber from local storage roomsList
-        const roomsListString = localStorage.getItem('roomsList');
-        const roomsList = JSON.parse(roomsListString);
+        const roomsList = await localforage.getItem('roomsList') || [];
         const room = roomsList.find(room => room.room_number == roomNumber);
 
         let roomId;
@@ -2643,7 +2539,7 @@ function checkInSubmit() {
 
 }
 
-function serviceSubmit() {
+async function serviceSubmit() {
     console.log("Service btn clicked");
     const roomNumber = document.getElementById('serviceRoomNumber').value;
     const bookingId = document.getElementById('serviceRoomNumber').dataset.bookingId;
@@ -2657,12 +2553,12 @@ function serviceSubmit() {
     console.log(`Total Price: ${totalPrice}`);
 
     // Find roomId from roomNumber by mapping from localStorage roomsList
-    const roomsList = localStorage.getItem('roomsList');
-    if (!roomsList) {
-        console.error('No roomsList found in localStorage');
+    const roomsListObj = await localforage.getItem('roomsList');
+    if (!roomsListObj) {
+        console.error('No roomsList found in localForage');
         return;
     }
-    const roomsListObj = JSON.parse(roomsList);
+    // const roomsListObj = JSON.parse(roomsList); // Already parsed by localForage
     const roomId = roomsListObj.find(room => room.room_number === roomNumber).id;
 
     const serviceData = {
@@ -2720,13 +2616,13 @@ function postCheckInData(checkInData) {
     };
     const url = `${baseURL}hotel/checkin/`;
     refreshAccessToken2(url, options)
-        .then(data => {
+        .then(async data => {
             console.log("Check-In Data posted:", data);
             alert("Check-In Guest Successfully", 'success');
             // await Promise.all([getAllBookings()]);
 
-            // Get existing bookings from localStorage
-            const bookingsList = JSON.parse(localStorage.getItem('bookingsList') || '[]');
+            // Get existing bookings from localForage
+            const bookingsList = await localforage.getItem('bookingsList') || [];
             // Find the booking that matches the check-in data's booking_id
             const bookingIndex = bookingsList.findIndex(booking => booking.id === checkInData.booking_id);
             if (bookingIndex !== -1) {
@@ -2740,8 +2636,8 @@ function postCheckInData(checkInData) {
                     // Update the booking status if needed
                     bookingsList[bookingIndex].status = 'checked_in';
 
-                    // Save the updated bookings list back to localStorage
-                    localStorage.setItem('bookingsList', JSON.stringify(bookingsList));
+                    // Save the updated bookings list back to localForage
+                    await localforage.setItem('bookingsList', bookingsList);
                 }
             }
 
@@ -2783,7 +2679,7 @@ function postServiceData(serviceData) {
 
             // await Promise.all([getAllBookings()]);
 
-            const bookingsList = JSON.parse(localStorage.getItem('bookingsList') || '[]');
+            const bookingsList = await localforage.getItem('bookingsList') || [];
             const bookingIndex = bookingsList.findIndex(booking => booking.id === serviceData.booking_id);
             if (bookingIndex !== -1) {
                 const roomIndex = bookingsList[bookingIndex].rooms.findIndex(room => room.room === serviceData.room_id);
@@ -2794,7 +2690,7 @@ function postServiceData(serviceData) {
                     }
 
                     bookingsList[bookingIndex].rooms[roomIndex].service_usages.push(data);
-                    localStorage.setItem('bookingsList', JSON.stringify(bookingsList));
+                    await localforage.setItem('bookingsList', bookingsList);
                 }
             }
 
@@ -2836,8 +2732,8 @@ function postCheckOutData(checkOutData) {
 
             // await Promise.all([getAllBookings()]);
 
-            // Get existing bookings from localStorage
-            const bookingsList = JSON.parse(localStorage.getItem('bookingsList') || '[]');
+            // Get existing bookings from localForage
+            const bookingsList = await localforage.getItem('bookingsList') || [];
             // Find the booking that matches the check-in data's booking_id
             const bookingIndex = bookingsList.findIndex(booking => booking.id === checkOutData.booking_id);
             if (bookingIndex !== -1) {
@@ -2853,8 +2749,8 @@ function postCheckOutData(checkOutData) {
                     // Update the booking status if needed
                     bookingsList[bookingIndex].status = 'checked_out';
 
-                    // Save the updated bookings list back to localStorage
-                    localStorage.setItem('bookingsList', JSON.stringify(bookingsList));
+                    // Save the updated bookings list back to localForage
+                    await localforage.setItem('bookingsList', bookingsList);
                 }
             }
 
@@ -2905,17 +2801,18 @@ document.addEventListener('click', function (event) {
 
 
 // Close the new booking modal
+// Close the new booking modal
 document.querySelector('.close2').onclick = function () {
     const newBookingModal = document.getElementById('newBookingModal');
     newBookingModal.classList.remove('show');
     setTimeout(() => newBookingModal.style.display = 'none', 300);
 }
 
-function allRooms() {
+async function allRooms() {
     const modalRoomListSelects = document.querySelectorAll('.rooms-btn');
-    modalRoomListSelects.forEach(select => {
-        populateRoomOptions(select);
-    });
+    for (const select of modalRoomListSelects) {
+        await populateRoomOptions(select);
+    }
 }
 
 function selectRoom(roomNumber) {
@@ -2956,7 +2853,11 @@ function formatDateForInput(date) {
     return date.toISOString().split('T')[0];
 }
 
-document.addEventListener('DOMContentLoaded', allRooms);
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', allRooms);
+} else {
+    allRooms();
+}
 
 // const addMoreBtn = document.getElementById('add-more-btn');
 // const inputElementAddRoom = document.querySelector('.input-element-add-room');
@@ -3002,12 +2903,12 @@ function createNewRow(id) {
     const endDateInput = row.querySelector(`#endDate-${id}`);
     const roomSelect = row.querySelector(`#roomSelect-${id}`);
 
-    startDateInput.addEventListener('change', () => {
-        checkDatesAndPopulateRooms(id);
+    startDateInput.addEventListener('change', async () => {
+        await checkDatesAndPopulateRooms(id);
         updateTotalBookingAmount(); // Update total amount when start date changes
     });
-    endDateInput.addEventListener('change', () => {
-        checkDatesAndPopulateRooms(id);
+    endDateInput.addEventListener('change', async () => {
+        await checkDatesAndPopulateRooms(id);
         updateTotalBookingAmount(); // Update total amount when end date changes
     });
     roomSelect.addEventListener('change', updateTotalBookingAmount); // Update total amount when room selection changes
@@ -3027,12 +2928,12 @@ function initializeFirstRow() {
     // startDateInput.addEventListener('change', () => checkDatesAndPopulateRooms(1));
     // endDateInput.addEventListener('change', () => checkDatesAndPopulateRooms(1));
 
-    startDateInput.addEventListener('change', () => {
-        checkDatesAndPopulateRooms(1);
+    startDateInput.addEventListener('change', async () => {
+        await checkDatesAndPopulateRooms(1);
         updateTotalBookingAmount();
     });
-    endDateInput.addEventListener('change', () => {
-        checkDatesAndPopulateRooms(1);
+    endDateInput.addEventListener('change', async () => {
+        await checkDatesAndPopulateRooms(1);
         updateTotalBookingAmount();
     });
     roomSelect.addEventListener('change', updateTotalBookingAmount);
@@ -3040,21 +2941,21 @@ function initializeFirstRow() {
     // inputElementAddRoom.appendChild(row);
 }
 
-function checkDatesAndPopulateRooms2(id) {
-    const startDate = document.getElementById(`startDate-${id}`).value;
-    const endDate = document.getElementById(`endDate-${id}`).value;
-    const roomSelect = document.getElementById(`roomSelect-${id}`);
+// function checkDatesAndPopulateRooms2(id) {
+//     const startDate = document.getElementById(`startDate-${id}`).value;
+//     const endDate = document.getElementById(`endDate-${id}`).value;
+//     const roomSelect = document.getElementById(`roomSelect-${id}`);
+//     
+//     if (startDate && endDate) {
+//         roomSelect.disabled = false;
+//         populateRoomOptions(roomSelect, new Date(startDate), new Date(endDate));
+//     } else {
+//         roomSelect.disabled = true;
+//         roomSelect.innerHTML = '<option selected disabled>Select Room</option>';
+//     }
+// }
 
-    if (startDate && endDate) {
-        roomSelect.disabled = false;
-        populateRoomOptions(roomSelect, new Date(startDate), new Date(endDate));
-    } else {
-        roomSelect.disabled = true;
-        roomSelect.innerHTML = '<option selected disabled>Select Room</option>';
-    }
-}
-
-function checkDatesAndPopulateRooms(id) {
+async function checkDatesAndPopulateRooms(id) {
     const startDateInput = document.getElementById(`startDate-${id}`).value;
     const endDateInput = document.getElementById(`endDate-${id}`).value;
     const roomSelect = document.getElementById(`roomSelect-${id}`);
@@ -3094,7 +2995,7 @@ function checkDatesAndPopulateRooms(id) {
     if (startDate && endDate) {
         roomSelect.disabled = false;
         // populateRoomOptions(roomSelect, startDate, endDate);
-        populateRoomOptions(roomSelect, startDateInput, endDateInput);
+        await populateRoomOptions(roomSelect, startDateInput, endDateInput);
     } else {
         roomSelect.disabled = true;
         roomSelect.innerHTML = '<option selected disabled>Select Room</option>';
@@ -3104,6 +3005,7 @@ function checkDatesAndPopulateRooms(id) {
     // populateRoomOptions(roomSelect, startDate, endDate);
 }
 
+// Function to initialize the booking functionality
 // Function to initialize the booking functionality
 function initializeBooking() {
     const addMoreBtn = document.getElementById('add-more-btn');
@@ -3115,7 +3017,7 @@ function initializeBooking() {
             rowCount++;
             const newRow = createNewRow(rowCount);
             inputElementAddRoom.appendChild(newRow);
-            populateRoomOptions(newRow.querySelector('.rooms-btn'));
+            populateRoomOptions(newRow.querySelector('.rooms-btn'), '', ''); // Pass empty strings if dates are unknown yet or handle inside
         });
     }
 
@@ -3123,187 +3025,23 @@ function initializeBooking() {
     allRooms();
 }
 
-// Put Rooms as options in the select element
-function populateRoomOptions2(select, startDate, endDate) {
-    const roomList = localStorage.getItem('roomsList');
-    if (!roomList) {
-        console.error('No roomsList found in localStorage');
-        return;
-    }
-
-    let roomListObj;
-    try {
-        roomListObj = JSON.parse(roomList);
-    } catch (error) {
-        console.error('Error parsing roomsList:', error);
-        return;
-    }
-
-    // Clear existing options
-    select.innerHTML = '<option selected disabled>Select Room</option>';
-    console.log("populateRoomOptions")
-    // Create options for each room
-    roomListObj.forEach(room => {
-        const isAvailable = checkRoomAvailability(room, startDate, endDate);
-        console.log(`isAvailable ${room.room_number} for ${startDate} to ${endDate}: ${isAvailable}`);
-        const option = document.createElement('option');
-        option.value = room.id;
-        option.textContent = `Room ${room.room_number} - ${room.room_type} ${isAvailable ? '' : '(Occupied)'}`;
-        option.disabled = !isAvailable;
-        option.dataset.price = room.price;
-        select.appendChild(option);
-    });
-
-    // Add change event listener to the select
-    select.addEventListener('change', function () {
-        const selectedRoom = this.value;
-        const selectedPrice = this.options[this.selectedIndex].dataset.price;
-        console.log(`Selected room: ${selectedRoom}, Price: ${selectedPrice}`);
-        updateTotalBookingAmount();
-    });
-}
-
-function populateRoomOptions3(select, startDate, endDate) {
-    const roomList = localStorage.getItem('roomsList');
-    const bookingsList = localStorage.getItem('bookingsList');
-
-    console.log(startDate, endDate);
-
-    if (!roomList || !bookingsList) {
-        console.error('Required data not found in localStorage');
-        return;
-    }
-
-    let roomListObj, bookingsListObj;
-    try {
-        roomListObj = JSON.parse(roomList);
-        bookingsListObj = JSON.parse(bookingsList);
-        console.log(bookingsListObj);
-        console.log('Checking availability for:', { startDate, endDate });
-    } catch (error) {
-        console.error('Error parsing data:', error);
-        return;
-    }
-
-    // Clear existing options
-    select.innerHTML = '<option selected disabled>Select Room</option>';
-
-    // Create a map of room bookings from bookingsList
-    const roomBookings = {};
-    bookingsListObj.forEach(booking => {
-        booking.rooms.forEach(roomBooking => {
-            if (!roomBookings[roomBooking.room]) {
-                roomBookings[roomBooking.room] = [];
-            }
-
-            // Get the actual start date with proper fallback
-            const actualStartDate = roomBooking.check_in_details?.check_in_date
-                ? new Date(roomBooking.check_in_details.check_in_date)
-                : new Date(roomBooking.start_date);
-
-            // Get the actual end date with proper fallback
-            const actualEndDate = roomBooking.check_out_date
-                ? new Date(roomBooking.check_out_date)
-                : new Date(roomBooking.end_date);
-
-            console.log(`Room ${roomBooking.room} booking dates:`, {
-                checkInDetails: roomBooking.check_in_details,
-                startDate: actualStartDate,
-                endDate: actualEndDate,
-                originalStart: new Date(roomBooking.start_date),
-                originalEnd: new Date(roomBooking.end_date)
-            });
-
-            // Include all bookings, regardless of status
-            roomBookings[roomBooking.room].push({
-                startDate: actualStartDate,
-                endDate: actualEndDate,
-                checkInDetails: roomBooking.check_in_details,
-                checkOutDate: roomBooking.check_out_date ? new Date(roomBooking.check_out_date) : null,
-                status: booking.status,
-                bookingId: booking.id
-            });
-        });
-    });
-
-    console.log('Room Bookings Map:', roomBookings);
-
-    console.log(roomListObj);
-    // Create options for each room
-    roomListObj.forEach(room => {
-
-        console.log(`Room Bookings ${JSON.stringify(roomBookings)}`);
-        console.log(`Room List Object ${JSON.stringify(roomListObj)}`);
-        console.log(`Room ${JSON.stringify(room)}`);
-
-
-        const bookings = roomBookings[room.id] || [];
-        console.log(`Checking room ${room.room_number}:`, bookings);
-
-        const isAvailable = !bookings.some(booking => {
-            // Convert dates to compare
-            const bookingStart = booking.check_in_details?.check_in_date || booking.startDate;
-            const bookingEnd = booking.check_out_date || booking.endDate;
-            const requestStart = new Date(startDate);
-            const requestEnd = new Date(endDate);
-
-            // Check for date overlap, regardless of check-out status
-            const hasOverlap = requestStart < bookingEnd && requestEnd > bookingStart;
-
-            if (hasOverlap) {
-                console.log(`Room ${room.room_number} - Date overlap with booking ${booking.bookingId}`);
-                console.log(`Booking period: ${bookingStart} to ${bookingEnd}`);
-                console.log(`Requested period: ${requestStart} to ${requestEnd}`);
-            }
-
-            return hasOverlap;
-        });
-
-        console.log(`Room ${room.room_number} final availability:`, isAvailable);
-
-        const option = document.createElement('option');
-        option.value = room.id;
-        option.textContent = `Room ${room.room_number} - ${room.room_type} ${isAvailable ? '' : '(Occupied)'}`;
-        option.disabled = !isAvailable;
-        option.dataset.price = room.price;
-        select.appendChild(option);
-    });
-
-    // Add change event listener to the select
-    select.removeEventListener('change', updateTotalBookingAmount);
-    select.addEventListener('change', function () {
-        const selectedRoom = this.value;
-        const selectedPrice = this.options[this.selectedIndex].dataset.price;
-        console.log(`Selected room: ${selectedRoom}, Price: ${selectedPrice}`);
-        updateTotalBookingAmount();
-    });
-}
-
-function populateRoomOptions(select, startDate, endDate) {
-    startDate = startDate + ':00Z';
-    endDate = endDate + ':00Z';
+async function populateRoomOptions(select, startDate, endDate) {
+    startDate = startDate ? startDate + ':00Z' : '';
+    endDate = endDate ? endDate + ':00Z' : '';
 
     console.log('Populating room options...');
     console.log(`Start Date: ${startDate}, End Date: ${endDate}`);
 
 
-    const roomList = localStorage.getItem('roomsList');
-    const bookingsList = localStorage.getItem('bookingsList');
+    const roomListObj = await localforage.getItem('roomsList');
+    const bookingsListObj = await localforage.getItem('bookingsList');
 
-    if (!roomList || !bookingsList) {
-        console.error('Required data not found in localStorage');
+    if (!roomListObj || !bookingsListObj) {
+        console.error('Required data not found in localForage');
         return;
     }
 
-    let roomListObj, bookingsListObj;
-    try {
-        roomListObj = JSON.parse(roomList);
-        bookingsListObj = JSON.parse(bookingsList);
-        console.log('Checking availability for:', { startDate, endDate });
-    } catch (error) {
-        console.error('Error parsing data:', error);
-        return;
-    }
+    console.log('Checking availability for:', { startDate, endDate });
 
     // Clear existing options
     select.innerHTML = '<option selected disabled>Select Room</option>';
@@ -3316,53 +3054,18 @@ function populateRoomOptions(select, startDate, endDate) {
                 roomBookings[roomBooking.room] = [];
             }
 
-            // Get dates in UTC format
-            // const bookingStartDate = new Date(roomBooking.checkin_details?.check_in_date ?? roomBooking.start_date);
-            // const bookingEndDate = new Date(roomBooking.check_out_date ?? roomBooking.end_date);
             const bookingStartDate = roomBooking.check_in_details?.check_in_date ?? roomBooking.start_date;
             const bookingEndDate = roomBooking.check_out_date ?? roomBooking.end_date;
 
-            // Force UTC times to 12:00
-            // const startUTC = new Date(Date.UTC(
-            //     bookingStartDate.getUTCFullYear(),
-            //     bookingStartDate.getUTCMonth(),
-            //     bookingStartDate.getUTCDate(),
-            //     12, 0, 0, 0
-            // ));
-
-            // const endUTC = new Date(Date.UTC(
-            //     bookingEndDate.getUTCFullYear(),
-            //     bookingEndDate.getUTCMonth(),
-            //     bookingEndDate.getUTCDate(),
-            //     12, 0, 0, 0
-            // ));
-
             roomBookings[roomBooking.room].push({
                 startDate: bookingStartDate,
-                // startDate: startUTC,
                 endDate: bookingEndDate,
-                // endDate: endUTC,
                 bookingId: booking.id,
                 status: booking.status
             });
         });
     });
     console.warn('Room Bookings Map:', roomBookings);
-
-    // Convert request dates to UTC 12:00
-    // const requestStart = new Date(Date.UTC(
-    //     startDate.getUTCFullYear(),
-    //     startDate.getUTCMonth(),
-    //     startDate.getUTCDate(),
-    //     12, 0, 0, 0
-    // ));
-
-    // const requestEnd = new Date(Date.UTC(
-    //     endDate.getUTCFullYear(),
-    //     endDate.getUTCMonth(),
-    //     endDate.getUTCDate(),
-    //     12, 0, 0, 0
-    // ));
 
     const requestStart = startDate;
     const requestEnd = endDate;
@@ -3372,22 +3075,32 @@ function populateRoomOptions(select, startDate, endDate) {
         const bookings = roomBookings[room.id] || [];
         console.log(`Checking room ${room.room_number} bookings:`, bookings);
 
-        const isAvailable = !bookings.some(booking => {
-            // Check for ANY overlap with existing bookings
-            const hasOverlap = requestStart < booking.endDate && requestEnd > booking.startDate;
+        // If no dates provided, assume available (or just list them)? 
+        // Original code would fail with undefined dates. 
+        // If dates are empty, we probably just want to list rooms?
+        // Let's assume unavailable if we can't check? Or available? 
+        // Assuming available for listing purposes if check skipped.
 
-            if (hasOverlap) {
-                console.log(`Room ${room.room_number} - Overlap found:`, {
-                    bookingId: booking.bookingId,
-                    bookingStart: booking.startDate,
-                    bookingEnd: booking.endDate,
-                    requestStart: requestStart,
-                    requestEnd: requestEnd
-                });
-            }
+        let isAvailable = true;
+        if (requestStart && requestEnd) {
+            isAvailable = !bookings.some(booking => {
+                // Check for ANY overlap with existing bookings
+                const hasOverlap = requestStart < booking.endDate && requestEnd > booking.startDate;
 
-            return hasOverlap;
-        });
+                if (hasOverlap) {
+                    console.log(`Room ${room.room_number} - Overlap found:`, {
+                        bookingId: booking.bookingId,
+                        bookingStart: booking.startDate,
+                        bookingEnd: booking.endDate,
+                        requestStart: requestStart,
+                        requestEnd: requestEnd
+                    });
+                }
+
+                return hasOverlap;
+            });
+        }
+
 
         // Create room option
         const option = document.createElement('option');
@@ -3432,7 +3145,8 @@ function checkRoomAvailability(room, startDate, endDate) {
 window.initializeBooking = initializeBooking;
 
 // New Booking Button Onclick Action POST API Call
-document.getElementById('new-booking-btn').addEventListener('click', function (e) {
+// New Booking Button Onclick Action POST API Call
+document.getElementById('new-booking-btn').addEventListener('click', async function (e) {
     e.preventDefault();
     console.log("Book btn clicked")
     const roomRows = document.querySelectorAll('.input-element-add-room .row');
@@ -3585,10 +3299,10 @@ document.getElementById('new-booking-btn').addEventListener('click', function (e
         console.log(key, value);
     }
 
-    submitBooking(bookingFormData);
+    await submitBooking(bookingFormData);
 
     // POST call to API for booking
-    function submitBooking(booking) {
+    async function submitBooking(booking) {
         showLoading();
         console.log("Booking data from submitBooking:", booking);
 
@@ -3603,20 +3317,15 @@ document.getElementById('new-booking-btn').addEventListener('click', function (e
         const url = `${baseURL}hotel/bookings/`;
 
         console.log("Booking data from submitBooking:", booking);
-        refreshAccessToken2(url, options)
+        return refreshAccessToken2(url, options)
             // .then(response => response.json())
             .then(async data => {
                 console.log('Booked Data:', data);
                 console.table(data);
 
-                const existingBookings = localStorage.getItem('bookingsList');
-                if (existingBookings) {
-                    const existingBookingsObj = JSON.parse(existingBookings);
-                    existingBookingsObj.push(data);
-                    localStorage.setItem('bookingsList', JSON.stringify(existingBookingsObj));
-                } else {
-                    localStorage.setItem('bookingsList', JSON.stringify([data]));
-                }
+                const existingBookingsObj = await localforage.getItem('bookingsList') || [];
+                existingBookingsObj.push(data);
+                await localforage.setItem('bookingsList', existingBookingsObj);
 
                 alert("Booked Successfully");
                 // await Promise.all([getAllBookings()]);

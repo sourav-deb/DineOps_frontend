@@ -2,9 +2,9 @@
 function addCatgeoryToList(name, description, status, id) {
     const itemsContainer = document.querySelector('.all-list-table-items');
 
-    if(status === true){
+    if (status === true) {
         var statusText = 'True';
-    }else{
+    } else {
         var statusText = 'False';
     }
 
@@ -40,7 +40,7 @@ function addCatgeoryToList(name, description, status, id) {
     editButton.addEventListener('click', () => {
         console.log("Edit button clicked");
         console.log(name, description, status, id);
-        
+
         // Warning message
         alert('Servcie Category Update Not Available currently.');
 
@@ -152,11 +152,16 @@ function updateDisableStatus(checkbox) {
 
 // Create getServiceCategoryListFromStorage() in common.js
 
-if (categoryData = getServiceCategoryListFromStorage()) {
-    passToCategoryList(categoryData);
-} else {
-    console.log('No data in storage');
+// Create getServiceCategoryListFromStorage() in common.js
+async function loadServiceCategories() {
+    let categoryData = await getServiceCategoryListFromStorage();
+    if (categoryData) {
+        passToCategoryList(categoryData);
+    } else {
+        console.log('No data in storage');
+    }
 }
+loadServiceCategories();
 
 function passToCategoryList(data) {
     data.forEach(item => {
@@ -314,7 +319,7 @@ function refreshCategoryList() {
     const button = document.querySelector('#refresh-btn');
     button.classList.add('spinning');
     console.log('Refreshing Category List');
-    
+
     // Call your existing category fetch function here
     getServiceCategoryList()
         .then(() => {
@@ -328,7 +333,7 @@ function refreshCategoryList() {
             console.error('Error refreshing categories:', error);
             button.classList.remove('spinning');
         });
-    
+
 
 }
 

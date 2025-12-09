@@ -2,7 +2,7 @@
 // baseURL = 'http://backend.hoteliswar.in:8001/api/';
 baseURL = 'https://iswar-d.pserver.codeartisanriz.me/api/';
 // Disable all console statements
-terminateConsole();
+// terminateConsole();
 
 // console.log(baseURL);
 
@@ -305,10 +305,10 @@ function getCategoryListRefresh() {
         };
 
         refreshAccessToken2(url, option)
-            .then(data => {
+            .then(async data => {
                 console.log('Categories Data:', data);
-                localStorage.setItem('categoryList', JSON.stringify(data));
-                getCategoryListFromStorage();
+                await localforage.setItem('categoryList', data);
+                await getCategoryListFromStorage();
                 resolve(data);
             })
             .catch(error => {
@@ -330,10 +330,10 @@ function getFoodListRefresh() {
         };
 
         refreshAccessToken2(url, option)
-            .then(data => {
+            .then(async data => {
                 console.log('Categories Data:', data);
-                localStorage.setItem('allFoodList', JSON.stringify(data));
-                getAllFoodListFromStorage();
+                await localforage.setItem('allFoodList', data);
+                await getAllFoodListFromStorage();
                 resolve(data);
             })
             .catch(error => {
@@ -355,10 +355,10 @@ function getOrdersListRefresh() {
         };
 
         refreshAccessToken2(url, option)
-            .then(data => {
+            .then(async data => {
                 console.log('Orders Data:', data);
-                localStorage.setItem('ordersList', JSON.stringify(data));
-                getAllOrdersFromStorage();
+                await localforage.setItem('ordersList', data);
+                await getAllOrdersFromStorage();
                 resolve(data);
             })
             .catch(error => {
@@ -380,10 +380,10 @@ function getCompleteBooking() {
         };
 
         refreshAccessToken2(url, option)
-            .then(data => {
+            .then(async data => {
                 console.log('Booking Data:', data);
-                localStorage.setItem('bookingsList', JSON.stringify(data));
-                getAllBookingsFromStorage();
+                await localforage.setItem('bookingsList', data);
+                await getAllBookingsFromStorage();
                 resolve(data);
             })
             .catch(error => {
@@ -406,43 +406,30 @@ function getCategoryList() {
 
     const url = `${baseURL}foods/categories/`;
 
-    refreshAccessToken2(url, option)
+    return refreshAccessToken2(url, option)
         // .then(response => response.json())
-        .then(data => {
+        .then(async data => {
             console.log('Data:', data);
             // Save the data to local storage
-            localStorage.setItem('categoryList', JSON.stringify(data));
-            getCategoryListFromStorage();
+            await localforage.setItem('categoryList', data);
+            // await getCategoryListFromStorage(); // Avoid circular dependency/redundant call
+            return data;
         })
         .catch(error => {
             console.log('Error fetching data:', error);
+            throw error;
         });
-
-    // function passToList(data) {
-    //     data.forEach(item => {
-    //         addCatgeoryToList(item.name, item.description, item.status, '', item.id);
-    //     });
-    // }
 };
 
-function getCategoryListFromStorage() {
-    const storedData = localStorage.getItem('categoryList');
-    if (storedData) {
-        if (storedData === 'undefined') {
-            console.log('No category list found in local storage');
-            getCategoryList();
-        }
-        const categoryList = JSON.parse(storedData);
+async function getCategoryListFromStorage() {
+    const categoryList = await localforage.getItem('categoryList');
+    if (categoryList && categoryList !== 'undefined') {
         console.log('Category list from local storage:', categoryList);
-        // passToCategoryList(categoryList);
         return categoryList;
     } else {
-        console.log('No category list found in local storage');
-        // Optionally, you can call getCategoryList() here to fetch from API if not in storage
-        getCategoryList();
-        // getCategoryListFromStorage();
+        console.log('No category list found in local storage, fetching from API...');
+        return await getCategoryList();
     }
-
 }
 
 
@@ -457,46 +444,29 @@ function getFooditems() {
     }
     const url = `${baseURL}foods/fooditems/`;
 
-    refreshAccessToken2(url, option)
+    return refreshAccessToken2(url, option)
         // .then(response => response.json())
-        .then(data => {
+        .then(async data => {
             console.log('Data:', data);
-            localStorage.setItem('allFoodList', JSON.stringify(data));
-            getAllFoodListFromStorage();
-            // document.getElementById('foods_data').innerHTML = JSON.stringify(data);
-
-            // const preElement = document.getElementById('foods_data');
-            // preElement.textContent = JSON.stringify(data, null, 2);
-            // passToList(data);
+            await localforage.setItem('allFoodList', data);
+            // await getAllFoodListFromStorage();
+            return data;
         })
         .catch(error => {
             console.log('Error fetching data:', error);
+            throw error;
         });
-
-    // function passToList(data) {
-    //     data.forEach(item => {
-    //         addItemToList(item.name, item.price, item.category_name, item.description, '', item.status, item.id, item.veg);
-    //     });
-    // }
 };
 
-function getAllFoodListFromStorage() {
-    const storedFoodData = localStorage.getItem('allFoodList');
-    if (storedFoodData) {
-        if (storedFoodData === 'undefined') {
-            console.log('No food list found in local storage');
-            getFooditems();
-        }
-        const foodList = JSON.parse(storedFoodData);
+async function getAllFoodListFromStorage() {
+    const foodList = await localforage.getItem('allFoodList');
+    if (foodList && foodList !== 'undefined') {
         console.log('Food list from local storage:', foodList);
-        // passToCategoryList(categoryList);
         return foodList;
     } else {
-        console.log('No category list found in local storage');
-        // Optionally, you can call getCategoryList() here to fetch from API if not in storage
-        getFooditems();
+        console.log('No food list found in local storage, fetching from API...');
+        return await getFooditems();
     }
-
 }
 
 
@@ -510,64 +480,33 @@ function getTablesData() {
         }
     }
     const url = `${baseURL}foods/tables/`;
-    refreshAccessToken2(url, option)
+    return refreshAccessToken2(url, option)
         // .then(response => response.json())
-        .then(data => {
+        .then(async data => {
             console.log('Data:', data);
-            localStorage.setItem('tablesList', JSON.stringify(data));
-            getTablesListFromStorage();
+            await localforage.setItem('tablesList', data);
+            // await getTablesListFromStorage();
+            return data;
         })
         .catch(error => {
             console.log('Error fetching table:', error);
+            throw error;
         });
-
-    return true;
-
 }
 
-function getTablesListFromStorage() {
-    const storedData = localStorage.getItem('tablesList');
-    if (storedData) {
-        if (storedData === 'undefined') {
-            console.log('No table list found in local storage');
-            getTablesData();
-        }
-        const tablesList = JSON.parse(storedData);
+async function getTablesListFromStorage() {
+    const tablesList = await localforage.getItem('tablesList');
+    if (tablesList && tablesList !== 'undefined') {
         console.log('Table list from local storage:', tablesList);
-        // passToCategoryList(categoryList);
         return tablesList;
     } else {
-        console.log('No category list found in local storage');
-        // Optionally, you can call getCategoryList() here to fetch from API if not in storage
-        getTablesData();
+        console.log('No table list found in local storage, fetching from API...');
+        return await getTablesData();
     }
-
 }
 
 
 // API Call to GET Rooms data
-function getRoomsData2() {
-    const option = {
-        method: 'GET',
-        headers: {
-            'Authorization': 'Bearer ' + getCookie('access_token'),
-            'Content-Type': 'application/json'
-        }
-    }
-    url = `${baseURL}hotel/rooms/`;
-    refreshAccessToken2(url, option)
-        // .then(response => response.json())
-        .then(data => {
-            console.log('Data:', data);
-            localStorage.setItem('roomsList', JSON.stringify(data));
-            getRoomsListFromStorage();
-            return true;
-        })
-        .catch(error => {
-            console.log('Error fetching table:', error)
-        });
-}
-
 async function getRoomsData() {
     const url = `${baseURL}hotel/rooms/`;
     const options = {
@@ -580,35 +519,30 @@ async function getRoomsData() {
 
     try {
         const response = await refreshAccessToken2(url, options);
-        // const roomsData = await response.json();
         // Save the updated room data to local storage
-        localStorage.setItem('roomsList', JSON.stringify(response));
+        await localforage.setItem('roomsList', response);
         console.log('Rooms data updated in local storage');
+        return response;
     } catch (error) {
         console.log('Error fetching rooms data:', error);
+        throw error;
     }
 }
 
-function getRoomsListFromStorage() {
-    const storedData = localStorage.getItem('roomsList');
-    if (storedData) {
-        if (storedData === 'undefined') {
-            console.log('No room list found in local storage');
-            getRoomsData();
-        }
-        const roomsList = JSON.parse(storedData);
+async function getRoomsListFromStorage() {
+    const roomsList = await localforage.getItem('roomsList');
+    if (roomsList && roomsList !== 'undefined') {
         console.log('Room list from local storage:', roomsList);
-        // passToCategoryList(categoryList);
         return roomsList;
     } else {
-        console.log('No category list found in local storage');
-        // Optionally, you can call getCategoryList() here to fetch from API if not in storage
-        getRoomsData();
+        console.log('No room list found in local storage, fetching from API...');
+        return await getRoomsData();
     }
 }
 
 
 // API Call GET Category List - Read
+// API Call GET Service Category List - Read
 function getServiceCategoryList() {
     const option = {
         method: 'GET',
@@ -620,47 +554,34 @@ function getServiceCategoryList() {
 
     const url = `${baseURL}hotel/service-categories/`;
 
-    refreshAccessToken2(url, option)
+    return refreshAccessToken2(url, option)
         // .then(response => response.json())
-        .then(data => {
+        .then(async data => {
             console.log('Data:', data);
             // Save the data to local storage
-            localStorage.setItem('serviceCategoryList', JSON.stringify(data));
-            getServiceCategoryListFromStorage();
+            await localforage.setItem('serviceCategoryList', data);
+            // await getServiceCategoryListFromStorage();
+            return data;
         })
         .catch(error => {
             console.log('Error fetching data:', error);
+            throw error;
         });
-
-    // function passToList(data) {
-    //     data.forEach(item => {
-    //         addCatgeoryToList(item.name, item.description, item.status, '', item.id);
-    //     });
-    // }
 };
 
-
-function getServiceCategoryListFromStorage() {
-    const storedData = localStorage.getItem('serviceCategoryList');
-    if (storedData) {
-        if (storedData === 'undefined') {
-            console.log('No service category list found in local storage');
-            getServiceCategoryList();
-        }
-        const categoryList = JSON.parse(storedData);
+async function getServiceCategoryListFromStorage() {
+    const categoryList = await localforage.getItem('serviceCategoryList');
+    if (categoryList && categoryList !== 'undefined') {
         console.log('Service Category list from local storage:', categoryList);
-        // passToCategoryList(categoryList);
         return categoryList;
     } else {
-        console.log('No service category list found in local storage');
-        // Optionally, you can call getCategoryList() here to fetch from API if not in storage
-        getServiceCategoryList();
+        console.log('No service category list found in local storage, fetching from API...');
+        return await getServiceCategoryList();
     }
-
 }
 
 
-// API Call GET Category List - Read
+// API Call GET Service List - Read
 function getServiceList() {
     const option = {
         method: 'GET',
@@ -672,46 +593,35 @@ function getServiceList() {
 
     const url = `${baseURL}hotel/services/`;
 
-    refreshAccessToken2(url, option)
+    return refreshAccessToken2(url, option)
         // .then(response => response.json())
-        .then(data => {
+        .then(async data => {
             console.log('Data:', data);
             // Save the data to local storage
-            localStorage.setItem('serviceList', JSON.stringify(data));
-            getServiceListFromStorage();
-            resolve(data); // Resolve the promise with the data
+            await localforage.setItem('serviceList', data);
+            // await getServiceListFromStorage();
+            return data;
         })
         .catch(error => {
             console.log('Error fetching data:', error);
+            throw error;
         });
-
-    // function passToList(data) {
-    //     data.forEach(item => {
-    //         addCatgeoryToList(item.name, item.description, item.status, '', item.id);
-    //     });
-    // }
 };
 
 
-function getServiceListFromStorage() {
-    const storedData = localStorage.getItem('serviceList');
-    if (storedData) {
-        if (storedData === 'undefined') {
-            console.log('No service category list found in local storage');
-            getServiceList();
-        }
-        const categoryList = JSON.parse(storedData);
-        console.log('Service Category list from local storage:', categoryList);
-        // passToCategoryList(categoryList);
+async function getServiceListFromStorage() {
+    const categoryList = await localforage.getItem('serviceList');
+    if (categoryList && categoryList !== 'undefined') {
+        console.log('Service List from local storage:', categoryList);
         return categoryList;
     } else {
-        console.log('No service category list found in local storage');
-        getServiceList();
+        console.log('No service list found in local storage, fetching from API...');
+        return await getServiceList();
     }
-
 }
 
 
+// API Call GET All Bookings - Read
 // API Call GET All Bookings - Read
 async function getAllBookings() {
     const option = {
@@ -724,40 +634,36 @@ async function getAllBookings() {
 
     const url = `${baseURL}hotel/bookings/`;
 
-    refreshAccessToken2(url, option)
+    return refreshAccessToken2(url, option)
         // .then(response => response.json())
-        .then(data => {
+        .then(async data => {
             console.log('All BookingsData:', data);
             // Save the data to local storage
-            localStorage.setItem('bookingsList', JSON.stringify(data));
-            getAllBookingsFromStorage();
-            resolve(data);
+            await localforage.setItem('bookingsList', data);
+            // await getAllBookingsFromStorage();
+            return data;
         })
         .catch(error => {
             console.log('Error fetching data:', error);
+            throw error;
         });
 
 };
 
 
-function getAllBookingsFromStorage() {
-    const storedData = localStorage.getItem('bookingsList');
-    if (storedData) {
-        if (storedData === 'undefined') {
-            console.log('No booking list found in local storage');
-            getAllBookings();
-        }
-        const categoryList = JSON.parse(storedData);
+async function getAllBookingsFromStorage() {
+    const categoryList = await localforage.getItem('bookingsList');
+    if (categoryList && categoryList !== 'undefined') {
         console.log('Booking list from local storage:', categoryList);
         return categoryList;
     } else {
-        console.log('No Booking list found in local storage');
-        getAllBookings();
+        console.log('No Booking list found in local storage, fetching from API...');
+        return await getAllBookings();
     }
-
 }
 
 
+// API Call GET All Billings - Read
 // API Call GET All Billings - Read
 async function getAllBilling() {
     const option = {
@@ -770,39 +676,35 @@ async function getAllBilling() {
 
     const url = `${baseURL}billing/bills/`;
 
-    refreshAccessToken2(url, option)
+    return refreshAccessToken2(url, option)
         // .then(response => response.json())
-        .then(data => {
+        .then(async data => {
             console.log('All Billing Data:', data);
             // Save the data to local storage
-            localStorage.setItem('billingList', JSON.stringify(data));
-            getAllBillingFromStorage();
-            resolve(data);
+            await localforage.setItem('billingList', data);
+            // await getAllBillingFromStorage();
+            return data;
         })
         .catch(error => {
             console.log('Error fetching data:', error);
+            throw error;
         });
 
 };
 
-function getAllBillingFromStorage() {
-    const storedData = localStorage.getItem('billingList');
-    if (storedData) {
-        if (storedData === 'undefined') {
-            console.log('No billing list found in local storage');
-            getAllBilling();
-        }
-        const categoryList = JSON.parse(storedData);
+async function getAllBillingFromStorage() {
+    const categoryList = await localforage.getItem('billingList');
+    if (categoryList && categoryList !== 'undefined') {
         console.log('Billing list from local storage:', categoryList);
         return categoryList;
     } else {
-        console.log('No Billing list found in local storage');
-        getAllBilling();
+        console.log('No Billing list found in local storage, fetching from API...');
+        return await getAllBilling();
     }
-
 }
 
 
+// API Call GET All Orders - Read
 // API Call GET All Orders - Read
 async function getAlllOrders() {
     const option = {
@@ -815,39 +717,35 @@ async function getAlllOrders() {
 
     const url = `${baseURL}orders/order/`;
 
-    refreshAccessToken2(url, option)
+    return refreshAccessToken2(url, option)
         // .then(response => response.json())
-        .then(data => {
+        .then(async data => {
             console.log('All Orders Data:', data);
             // Save the data to local storage
-            localStorage.setItem('ordersList', JSON.stringify(data));
-            getAllOrdersFromStorage();
-            resolve(data);
+            await localforage.setItem('ordersList', data);
+            // await getAllOrdersFromStorage();
+            return data;
         })
         .catch(error => {
             console.log('Error fetching data:', error);
+            throw error;
         });
 
 };
 
-function getAllOrdersFromStorage() {
-    const storedData = localStorage.getItem('ordersList');
-    if (storedData) {
-        if (storedData === 'undefined') {
-            console.log('No orders list found in local storage');
-            getALlOrders();
-        }
-        const ordersList = JSON.parse(storedData);
+async function getAllOrdersFromStorage() {
+    const ordersList = await localforage.getItem('ordersList');
+    if (ordersList && ordersList !== 'undefined') {
         console.log('Orders list from local storage:', ordersList);
         return ordersList;
     } else {
-        console.log('No Orders list found in local storage');
-        getALlOrders();
+        console.log('No Orders list found in local storage, fetching from API...');
+        return await getAlllOrders();
     }
-
 }
 
 // API Call GET All Orders - Read
+// API Call GET All Payments - Read
 async function getAllPayments() {
     const option = {
         method: 'GET',
@@ -859,36 +757,31 @@ async function getAllPayments() {
 
     const url = `${baseURL}billing/bill-payments/`;
 
-    refreshAccessToken2(url, option)
+    return refreshAccessToken2(url, option)
         // .then(response => response.json())
-        .then(data => {
+        .then(async data => {
             console.log('All Payments Data:', data);
             // Save the data to local storage
-            localStorage.setItem('paymentsList', JSON.stringify(data));
-            getAllPaymentsFromStorage();
-            resolve(data);
+            await localforage.setItem('paymentsList', data);
+            // await getAllPaymentsFromStorage();
+            return data;
         })
         .catch(error => {
             console.log('Error fetching data:', error);
+            throw error;
         });
 
 };
 
-function getAllPaymentsFromStorage() {
-    const storedData = localStorage.getItem('paymentsList');
-    if (storedData) {
-        if (storedData === 'undefined') {
-            console.log('No Payments list found in local storage');
-            getALlOrders();
-        }
-        const paymentsList = JSON.parse(storedData);
+async function getAllPaymentsFromStorage() {
+    const paymentsList = await localforage.getItem('paymentsList');
+    if (paymentsList && paymentsList !== 'undefined') {
         console.log('Payments list from local storage:', paymentsList);
         return paymentsList;
     } else {
-        console.log('No Payments list found in local storage');
-        getAllPayments();
+        console.log('No Payments list found in local storage, fetching from API...');
+        return await getAllPayments();
     }
-
 }
 
 
@@ -1018,7 +911,8 @@ function clearCookies() {
 }
 
 function clearLocalStorage() {
-    localStorage.clear();
+    // localStorage.clear();
+    localforage.clear();
 }
 
 
@@ -1309,12 +1203,12 @@ function addMarqueeText() {
     // Create container
     const container = document.createElement('div');
     container.id = 'custom-marquee-container';
-    
+
     // Create text element
     const text = document.createElement('div');
     text.id = 'custom-marquee-text';
     text.textContent = 'Note: Please clear all the outstanding payments before 31st January 2025 to avoid software interruptions.';
-    
+
     // Add elements to DOM
     container.appendChild(text);
     document.body.insertBefore(container, document.body.firstChild);

@@ -4,6 +4,12 @@
 
 
 
+// billingDisplay();
+
+// getAllBilling();
+
+
+
 async function billingDisplay() {
 
     const billingData = await getAllBillingFromStorage();
@@ -40,7 +46,7 @@ async function billingDisplayUI() {
 
     displayArea.innerHTML = '';
 
-    const allBilling = localStorage.getItem('billingList');
+    // const allBilling = localStorage.getItem('billingList'); // Unused and sync
 
     const combinedData = await billingDisplay();
 
@@ -96,9 +102,9 @@ async function billingDisplayUI() {
 
 billingDisplayUI();
 
-function viewOrderModal(item) {
+async function viewOrderModal(item) {
 
-    const roomsData = JSON.parse(localStorage.getItem('roomsList'));
+    const roomsData = await localforage.getItem('roomsList') || [];
 
     const modal = document.getElementById('roomModal');
     // const modalBody = modal.querySelector('.modal-body');
@@ -176,8 +182,8 @@ document.querySelector('.close').onclick = function () {
 async function viewBillModal(item) {
     console.log('view bill modal');
     console.log(item);
-    getAlllOrders();
-    generatePrintableBill(item);
+    await getAllOrdersFromStorage();
+    await generatePrintableBill(item);
 
 }
 
@@ -293,19 +299,19 @@ function paymentPOST(bill) {
         }
 
         refreshAccessToken2(url, options)
-            .then(data => {
+            .then(async data => {
                 console.log(data);
                 alert('Payment Successful', 'success');
 
-                // Update billing status in localStorage
-                let billingList = JSON.parse(localStorage.getItem('billingList') || '[]');
+                // Update billing status in localForage
+                let billingList = await localforage.getItem('billingList') || [];
                 billingList = billingList.map(bill => {
                     if (bill.id === paymentData.bill_id) {
                         return { ...bill, status: 'paid' };
                     }
                     return bill;
                 });
-                localStorage.setItem('billingList', JSON.stringify(billingList));
+                await localforage.setItem('billingList', billingList);
 
 
                 // document.getElementById('paymentModal').classList.remove('show');
@@ -337,16 +343,17 @@ document.querySelector('.close-payment').onclick = function () {
 }
 
 async function generatePrintableBill(item) {
-    // Get required data from localStorage
-    const foodItems = getAllFoodListFromStorage();
-    const orders = getAllOrdersFromStorage();
+    // Get required data from localForage
+    const foodItems = await localforage.getItem('allFoodList') || [];
+    const orders = await localforage.getItem('ordersList') || [];
+    const roomsList = await localforage.getItem('roomsList') || [];
 
     // Create bill container
     const billContainer = document.createElement('div');
     billContainer.className = 'bill-container';
 
     // Page 1: Room and Service Details
-    const page1 = createRoomServiceBillPage(item);
+    const page1 = createRoomServiceBillPage(item, roomsList);
     billContainer.appendChild(page1);
 
     // Page 2+: Order Details (multiple pages if needed)
@@ -376,15 +383,15 @@ async function generatePrintableBill(item) {
     printWindow.print();
 }
 
-function createRoomServiceBillPage(item) {
+function createRoomServiceBillPage(item, roomsList) {
     const page = document.createElement('div');
     page.className = 'bill-page';
 
     const pageContainer = document.createElement('div');
     pageContainer.className = 'page-container';
 
-    // Get rooms list from localStorage
-    const roomsList = getRoomsListFromStorage();
+    // Get rooms list passed as arg
+    // const roomsList = getRoomsListFromStorage(); // Removed
 
     // Helper function to format date and time
     const formatDateTime = (dateString) => {
@@ -456,7 +463,7 @@ function createRoomServiceBillPage(item) {
                 </tr>
             </thead>
             <tbody>
-                 ${item.service_details.map(service => {
+                ${item.service_details.map(service => {
         // Find the room details from roomsList
         const roomDetails = roomsList.find(r => r.id === service.room_id);
         return `

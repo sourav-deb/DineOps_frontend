@@ -59,9 +59,9 @@ function deleteCategory(id) {
             console.log('Data:', data);
 
             // Update the local storage with the updated list
-            const allCatgList = JSON.parse(localStorage.getItem('categoryList'));
+            const allCatgList = await localforage.getItem('categoryList') || [];
             const updatedList = allCatgList.filter(item => item.id !== id);
-            localStorage.setItem('categoryList', JSON.stringify(updatedList));
+            await localforage.setItem('categoryList', updatedList);
 
             document.getElementById('nav-item-categories').click();
 
@@ -209,11 +209,15 @@ function updateDisableStatus(checkbox) {
 // getCategoryList();
 // getCategoryListFromStorage();
 
-if (categoryData = getCategoryListFromStorage()) {
-    passToCategoryList(categoryData);
-} else {
-    console.log('No data in storage');
+async function loadCategories() {
+    let categoryData = await getCategoryListFromStorage();
+    if (categoryData) {
+        passToCategoryList(categoryData);
+    } else {
+        console.log('No data in storage');
+    }
 }
+loadCategories();
 
 function passToCategoryList(data) {
     data.forEach(item => {
@@ -349,11 +353,11 @@ document.getElementById('update-category').addEventListener('click', function (e
                 console.log("Category Updated Successfully")
 
                 // Update in Local Storage
-                const allCatgList = JSON.parse(localStorage.getItem('categoryList') || '[]');
-                const updatedItemIndex = allCatgList.findIndex(item => item.id == updatedItem.id);
+                const allCatgList = await localforage.getItem('categoryList') || [];
+                const updatedItemIndex = allCatgList.findIndex(item => item.id == updatedCatgData.id);
                 if (updatedItemIndex !== -1) {
                     allCatgList[updatedItemIndex] = data;
-                    localStorage.setItem('categoryList', JSON.stringify(allCatgList));
+                    await localforage.setItem('categoryList', allCatgList);
                 }
 
                 document.querySelector('.close').click();

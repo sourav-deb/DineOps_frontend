@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard App</title>
-    <link rel="stylesheet" href="./dashboard-app/dashboard-content.css" >
+    <link rel="stylesheet" href="./dashboard-app/dashboard-content.css">
 </head>
 
 <body>
@@ -33,6 +33,13 @@
                 <div class="small-count" id="availableRoomsCount">0</div>
             </div>
         </div>
+        <div class="small-card total-bills">
+            <i class="fas fa-coins card-icon"></i>
+            <div class="small-card-content">
+                <div class="small-card-title">Today's Restaurant Sales</div>
+                <div class="small-count" id="totalBillsCount">₹0</div>
+            </div>
+        </div>
     </div>
 
     <!-- add a button here to sync all the data from the server -->
@@ -45,7 +52,7 @@
 
 
 
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
     <script src="./../common.js"></script>
 </body>
 

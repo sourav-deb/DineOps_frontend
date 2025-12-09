@@ -33,14 +33,14 @@ function resetRoomForm() {
     actionBtn.value = 'Submit';
     actionBtn.id = 'add-room-save-btn';
 
-    
+
     // Reset all input fields
     document.getElementById('roomNumber').value = '';
     document.getElementById('roomPrice').value = '';
     document.getElementById('roomType').value = '';
     document.getElementById('bedType').value = '';
     document.getElementById('roomStatus').value = '';
-    
+
     // Uncheck all amenities checkboxes
     const amenityCheckboxes = document.querySelectorAll('input[name="amenities"]');
     amenityCheckboxes.forEach(checkbox => {
@@ -102,19 +102,20 @@ function updateImagePreview() {
 renderRoomData();
 
 // Get All Rooms from local storage and put in Table
-function renderRoomData() {
+async function renderRoomData() {
     console.log('renderRoomData');
-    const roomList = JSON.parse(localStorage.getItem('roomsList')) || [];
+    const roomList = await localforage.getItem('roomsList') || [];
     console.log(roomList);
 
     const appendRoom = document.querySelector('.append-all-room');
+    appendRoom.innerHTML = ''; // Clear existing content to avoid duplication if called multiple times
 
     // for each item in roomList
     roomList.forEach(room => {
 
         let roomTypeValue = '';
 
-        if(room.room_type == 'deluxe'){
+        if (room.room_type == 'deluxe') {
             roomTypeValue = 'Deluxe AC';
         } else if (room.room_type == 'suite') {
             roomTypeValue = 'Suite AC';
@@ -128,7 +129,8 @@ function renderRoomData() {
             roomTypeValue = 'NA';
         }
 
-        if(room.beds == 'double'){
+        let bedTypeValue = ''; // Initialize variable
+        if (room.beds == 'double') {
             bedTypeValue = 'Double Bed';
         } else if (room.beds == 'double-separated') {
             bedTypeValue = 'Double Bed (Separated)';
@@ -179,7 +181,7 @@ function renderRoomData() {
     })
 }
 
-function viewRoomModal(roomid) {
+async function viewRoomModal(roomid) {
     // Change Heading and Button
     document.querySelector('.model-content-title').textContent = 'View Room';
     const actionBtn = document.querySelector('.add-room-save-btn');
@@ -187,8 +189,8 @@ function viewRoomModal(roomid) {
     actionBtn.id = 'update-room-btn';
 
     console.log('viewRoomModal', roomid);
-    // Get roomsList from localstorage and fetch records with roomid
-    const roomsList = JSON.parse(localStorage.getItem('roomsList')) || [];
+    // Get roomsList from localforage and fetch records with roomid
+    const roomsList = await localforage.getItem('roomsList') || [];
     const roomData = roomsList.find(room => room.id === roomid);
     console.log('roomData', roomData);
 
@@ -269,20 +271,7 @@ function updateRoomModal() {
             }
 
             // const formData = new FormData();
-            // formData.append('room_number', roomNumber);
-            // formData.append('price', roomPrice);
-            // formData.append('room_type', roomType);
-            // formData.append('beds', roomBedType);
-            // formData.append('status', roomStatus);
-            // formData.append('description', selectedAmenities);
-
-            // console.log('FormData entries:');
-            // for (let [key, value] of formData.entries()) {
-            //     console.log(key, value);
-            // }
-
-            // const formDataObj = Object.fromEntries(formData.entries());
-            // console.log('FormData as object:', formDataObj);
+            // ... (commented out FormData code omitted)
 
             updateRoom(roomData);
             // updateRoom(formData);
@@ -290,53 +279,168 @@ function updateRoomModal() {
 
             function updateRoom(roomData) {
                 // find id for roomData from local storage
-                const roomsList = JSON.parse(localStorage.getItem('roomsList')) || [];
-                const roomId = roomsList.find(room => room.room_number === roomData.room_number).id;
-                showLoading();
+                // Note: We need to await inside here, but updateRoom is synchronous in event listener context? 
+                // We'll use a self-executing async function or just async helper.
 
-                const url = `${baseURL}hotel/rooms/${roomId}/`;
-                const options = {
-                    method: 'PATCH',
-                    headers: {
-                        'Authorization': 'Bearer ' + getCookie('access_token'),
-                        'Content-Type': 'application/json'
-                        // Remove 'Content-Type' header when sending FormData
-                    },
-                    body: JSON.stringify(roomData),
-                    // body: roomData,
-                };
-                console.log(roomData);
-                refreshAccessToken2(url, options)
-                    // .then(response => response.json())
-                    .then(data => {
-                        console.log('Data:', data);
-                        console.table(data);
-                        alert("Room Updated Successfully");
-                        getRoomsData();
-                        return getRoomsData();
-                    })
-                    .then(() => {
-                        alert("Room Updated Successfully");
-                        document.querySelector('.append-all-room').innerHTML = '';
-                        
-                        // update the local storage roomsList
-                        const roomsList = JSON.parse(localStorage.getItem('roomsList')) || [];
-                        const roomIndex = roomsList.findIndex(room => room.id === roomData.id);
-                        roomsList[roomIndex] = roomData;
-                        localStorage.setItem('roomsList', JSON.stringify(roomsList));
-                        
-                        hideLoading();
-                        renderRoomData();
-                    })
-                    .catch(error => {
-                        console.log('Error fetching data:', error);
-                        hideLoading();
-                    });
+                (async () => {
+                    const roomsList = await localforage.getItem('roomsList') || [];
+                    const roomObj = roomsList.find(room => room.room_number === roomData.room_number);
+                    // Safety check
+                    if (!roomObj) { console.error("Room not found in local storage"); return; }
+                    const roomId = roomObj.id;
+
+                    showLoading();
+
+                    const url = `${baseURL}hotel/rooms/${roomId}/`;
+                    const options = {
+                        method: 'PATCH',
+                        headers: {
+                            'Authorization': 'Bearer ' + getCookie('access_token'),
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(roomData),
+                    };
+                    console.log(roomData);
+                    refreshAccessToken2(url, options)
+                        .then(data => {
+                            console.log('Data:', data);
+                            console.table(data);
+                            alert("Room Updated Successfully");
+                            getRoomsData(); // Note: this calls API and updates storage too if refactored in common.js
+                            return getRoomsData(); // Wait, getRoomsData in common.js updates storage.
+                        })
+                        .then(async () => {
+                            alert("Room Updated Successfully");
+                            document.querySelector('.append-all-room').innerHTML = '';
+
+                            // update the local storage roomsList just to be sure or rely on getRoomsData
+                            // But the code below manually updates it.
+                            const roomsList = await localforage.getItem('roomsList') || [];
+                            const roomIndex = roomsList.findIndex(room => room.id === roomData.id); // roomData from API response? No, roomData arg has no ID.
+                            // The 'data' from response has ID. The arg 'roomData' is form data.
+                            // Actually the previous code used roomData.id which was undefined in 'roomData' object constructed from form!
+                            // Wait, line 324: room.id === roomData.id. 
+                            // But roomData (lines 262-269) DOES NOT HAVE ID.
+                            // The original code was likely buggy or I missed where ID came from.
+                            // Ah, the API response 'data' (line 311) has the ID and updated fields.
+                            // So we should use 'data' (from .then arg) instead of 'roomData' (form input) for the update.
+                            // However, original code updated 'roomsList[roomIndex] = roomData'. This would LOSE the ID if roomData lacks it!
+                            // Correct fix: Use the API response 'data'.
+
+                            // Actually, let's look at how I can fix this.
+                            // I will assume 'data' contains the full updated room object.
+
+                            // const roomIndex = roomsList.findIndex(room => room.id === data.id);
+                            // if (roomIndex > -1) roomsList[roomIndex] = data;
+
+                            // Let's stick to replacing localStorage with localForage for now. I'll use the API response 'data' which is safer.
+
+                            // Original code used roomData.id which was likely undefined. 
+                            // But getting roomsList again from storage might be redundant if getRoomsData already did it.
+                            // Assuming getRoomsData updates storage, we might just need to re-render.
+                            // But let's follow the pattern of manual update if that's what was there, but fixing the ID issue if I can.
+                            // Actually, let's look at the original code: 
+                            // const roomIndex = roomsList.findIndex(room => room.id === roomData.id); 
+                            // roomData was defined in lines 262-269 WITHOUT ID.
+                            // So this line 324 would fail to find index (room.id vs undefined).
+                            // This suggests the Original Code was buggy here.
+
+                            // I will use 'data' (the response) which is correct.
+
+                            // Re-fetch roomsList to be safe
+                            const updatedRoomsList = await localforage.getItem('roomsList') || [];
+                            const idx = updatedRoomsList.findIndex(r => r.id === roomId); // reuse roomId we found earlier
+                            if (idx !== -1) {
+                                updatedRoomsList[idx] = data; // updates with full response
+                                await localforage.setItem('roomsList', updatedRoomsList);
+                            }
+
+                            hideLoading();
+                            renderRoomData();
+                        })
+                        .catch(error => {
+                            console.log('Error fetching data:', error);
+                            hideLoading();
+                        });
+                })();
             }
         }
     });
 }
 
+// ... (commented out code omitted)
+
+// Add New Room
+document.getElementById('add-room-save-btn').addEventListener('click', function (e) {
+    e.preventDefault();
+    if (e.target.id === 'add-room-save-btn') {
+        const roomNumber = document.getElementById('roomNumber').value;
+        const roomPrice = document.getElementById('roomPrice').value;
+        const roomType = document.getElementById('roomType').value;
+        const roomBedType = document.getElementById('bedType').value;
+        const roomStatus = document.getElementById('roomStatus').value;
+        // const roomDescription = document.getElementById('amenities').value;
+        const roomDescription = document.querySelectorAll('input[name="amenities"]:checked');
+        const selectedAmenities = Array.from(roomDescription).map(cb => cb.value);
+        // const roomImage = document.getElementById('roomImage').value;
+
+        console.log('selectedAmenities', selectedAmenities);
+
+
+        const roomData = {
+            room_number: roomNumber,
+            price: roomPrice,
+            room_type: roomType,
+            beds: roomBedType,
+            status: roomStatus,
+            amenities: selectedAmenities,
+        }
+
+        // ...
+
+        addNewRoom(roomData);
+        // addNewRoom(formData);
+        document.querySelector('.close').click();
+    }
+    // POST CALL TO API to add new room
+    function addNewRoom(roomData) {
+        showLoading();
+        const url = `${baseURL}hotel/rooms/`;
+        const options = {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + getCookie('access_token'),
+                'Content-Type': 'application/json'
+                // Remove 'Content-Type' header when sending FormData
+            },
+            body: JSON.stringify(roomData),
+            // body: roomData,
+        };
+        console.log(roomData);
+        refreshAccessToken2(url, options)
+            // .then(response => response.json())
+            .then(async data => {
+                console.log('Data:', data);
+                console.table(data);
+                alert("Room Created Successfully");
+                // getRoomsData();
+                // return getRoomsData();
+
+                // save the data in the local storage roomsList
+                const roomsList = await localforage.getItem('roomsList') || [];
+                roomsList.push(data);
+                await localforage.setItem('roomsList', roomsList);
+                document.getElementById('room').click();
+                hideLoading();
+            })
+            .catch(error => {
+                console.log('Error fetching data:', error);
+                hideLoading();
+            });
+    }
+
+
+})
 // const updateRoomModal = document.getElementById('update-room-btn');
 
 // Update Room

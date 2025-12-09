@@ -3,7 +3,7 @@
 console.log(baseURL);
 
 // Add keyboard shortcut listener
-document.addEventListener('keydown', function(event) {
+document.addEventListener('keydown', function (event) {
     console.log(`Ctrl + Shift + R pressed`);
     // Check for Shift + Ctrl + R
     if (event.shiftKey && event.ctrlKey && event.key === 'R') {
@@ -138,7 +138,7 @@ document.getElementById('loginForm').addEventListener('submit', function (event)
         },
         body: JSON.stringify({
             username: username,
-            password: password 
+            password: password
         })
     })
         .then(response => {
@@ -157,10 +157,15 @@ document.getElementById('loginForm').addEventListener('submit', function (event)
                 // await Promise.all([callAllAPI()]);
 
                 // if local storage data exists then redirect to dashboard else call all api
-                if (localStorage.getItem('categoryList') && localStorage.getItem('allFoodList') && localStorage.getItem('tablesList') && localStorage.getItem('roomsList') && localStorage.getItem('serviceCategoryList') && localStorage.getItem('serviceList') && localStorage.getItem('bookingsList') && localStorage.getItem('billingList')  && localStorage.getItem('ordersList') && localStorage.getItem('paymentsList') ) {
+                // if local storage data exists then redirect to dashboard else call all api
+                const requiredKeys = ['categoryList', 'allFoodList', 'tablesList', 'roomsList', 'serviceCategoryList', 'serviceList', 'bookingsList', 'billingList', 'ordersList', 'paymentsList'];
+                const existingData = await Promise.all(requiredKeys.map(key => localforage.getItem(key)));
+                const allDataExists = existingData.every(data => data !== null && data !== 'undefined');
+
+                if (allDataExists) {
                     window.location.href = './../dashboard/dashboard.html';
                 } else {
-                    alert('Please wait while we are fetching data from server...','info');
+                    alert('Please wait while we are fetching data from server...', 'info');
                     await getCallAllAPI();
                     window.location.href = './../dashboard/dashboard.html';
                 }
@@ -279,13 +284,18 @@ async function getCallAllAPI() {
             'paymentsList'
         ];
 
-        const missingData = requiredData.filter(key => !localStorage.getItem(key));
-        
+        // Verify all data is in localStorage
+        const dataChecks = await Promise.all(requiredData.map(async key => {
+            const data = await localforage.getItem(key);
+            return { key, exists: data !== null && data !== 'undefined' };
+        }));
+        const missingData = dataChecks.filter(item => !item.exists).map(item => item.key);
+
         if (missingData.length > 0) {
             console.warn('Missing data in localStorage:', missingData);
             // Retry missing data fetches
             const retryPromises = missingData.map(key => {
-                switch(key) {
+                switch (key) {
                     case 'categoryList': return getCategoryList();
                     case 'allFoodList': return getFooditems();
                     case 'tablesList': return getTablesData();

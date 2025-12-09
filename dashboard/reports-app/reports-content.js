@@ -1,19 +1,35 @@
 // Set default date to today
 document.addEventListener('DOMContentLoaded', () => {
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('reportDate').value = today;
+    // const today = new Date().toISOString().split('T')[0];
+    // Use IST date for default
+    const getISTDateString = (dateInput) => {
+        const date = dateInput ? new Date(dateInput) : new Date();
+        const offset = (5 * 60 + 30) * 60 * 1000;
+        const istDate = new Date(date.getTime() + offset);
+        return istDate.toISOString().split('T')[0];
+    };
+
+    document.getElementById('reportDate').value = getISTDateString();
     generateReport();
 });
 
-function generateReport() {
+async function generateReport() {
+    // Helper to get date string in IST (+5:30)
+    const getISTDateString = (dateInput) => {
+        const date = dateInput ? new Date(dateInput) : new Date();
+        const offset = (5 * 60 + 30) * 60 * 1000;
+        const istDate = new Date(date.getTime() + offset);
+        return istDate.toISOString().split('T')[0];
+    };
+
     const selectedDate = document.getElementById('reportDate').value;
-    const ordersList = JSON.parse(localStorage.getItem('ordersList') || '[]');
-    const billingList = JSON.parse(localStorage.getItem('billingList') || '[]');
-    const paymentsList = JSON.parse(localStorage.getItem('paymentsList') || '[]');
-    
+    const ordersList = await localforage.getItem('ordersList') || [];
+    const billingList = await localforage.getItem('billingList') || [];
+    const paymentsList = await localforage.getItem('paymentsList') || [];
+
     // Filter orders for selected date
     const dailyOrders = ordersList.filter(order => {
-        const orderDate = new Date(order.created_at).toISOString().split('T')[0];
+        const orderDate = getISTDateString(order.created_at);
         return orderDate === selectedDate;
     });
 
@@ -22,12 +38,11 @@ function generateReport() {
         const order = dailyOrders.find(o => o.id === bill.order_id);
         return order !== undefined;
     });
-    
 
     // Calculate totals
     const totalOrders = dailyOrders.length;
     const totalBilled = dailyBills.reduce((sum, bill) => sum + parseFloat(bill.net_amount), 0);
-    
+
     // Calculate total received from payments
     const totalReceived = dailyBills.reduce((sum, bill) => {
         const payment = paymentsList.find(p => p.bill_id === bill.id);
@@ -49,7 +64,7 @@ function generateReport() {
     dailyOrders.forEach(order => {
         const row = document.createElement('tr');
         const time = new Date(order.created_at).toLocaleTimeString();
-        
+
         row.innerHTML = `
             <td>${order.id}</td>
             <td>${time}</td>
@@ -58,7 +73,7 @@ function generateReport() {
             <td>₹${parseFloat(order.total).toFixed(2)}</td>
             <td class="status-${order.status}">${order.status.toUpperCase()}</td>
         `;
-        
+
         tableBody.appendChild(row);
     });
 }
@@ -67,15 +82,15 @@ function generateReport() {
 function refreshReportsData() {
     showLoading();
     const button = document.querySelector('#refresh-btn-reports');
-    button.classList.add('spinning');
-    
+    if (button) button.classList.add('spinning');
+
     // Show loading or alert
     alert('Syncing Reports Data', 'info');
-    
+
     // Fetch billing data
     const billingUrl = `${baseURL}billing/bills/`;
     const paymentsUrl = `${baseURL}billing/bill-payments/`;
-    
+
     const options = {
         method: 'GET',
         headers: {
@@ -89,28 +104,28 @@ function refreshReportsData() {
         refreshAccessToken2(billingUrl, options),
         refreshAccessToken2(paymentsUrl, options)
     ])
-    .then(([billingData, paymentsData]) => {
-        // Update localStorage
-        localStorage.setItem('billingList', JSON.stringify(billingData));
-        localStorage.setItem('paymentsList', JSON.stringify(paymentsData));
-        
-        // Regenerate report with new data
-        generateReport();
-        
-        // Remove spinning class and show success
-        setTimeout(() => {
+        .then(async ([billingData, paymentsData]) => {
+            // Update localForage
+            await localforage.setItem('billingList', billingData);
+            await localforage.setItem('paymentsList', paymentsData);
+
+            // Regenerate report with new data
+            await generateReport();
+
+            // Remove spinning class and show success
+            setTimeout(() => {
+                if (button) button.classList.remove('spinning');
+                alert('Reports Data Synced', 'success');
+            }, 1000);
+            // alert('Reports Data Synced', 'success');
+            hideLoading();
+        })
+        .catch(error => {
+            console.error('Error refreshing reports data:', error);
             button.classList.remove('spinning');
-            alert('Reports Data Synced', 'success');
-        }, 1000);
-        alert('Reports Data Synced', 'success');
-        hideLoading();
-    })
-    .catch(error => {
-        console.error('Error refreshing reports data:', error);
-        button.classList.remove('spinning');
-        alert('Error Syncing Reports Data', 'error');
-        hideLoading();
-    });
+            alert('Error Syncing Reports Data', 'error');
+            hideLoading();
+        });
 }
 
 // Add event listener

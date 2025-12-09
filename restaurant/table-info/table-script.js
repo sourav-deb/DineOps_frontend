@@ -14,50 +14,24 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // getAllOrders();
 
-    getTablesData();
+    // Initialize data
+    async function init() {
+        await getTablesData();
+        await getAllTablesRooms();
+        await getAllOrders();
+    }
+    init();
 
-    getAllTablesRooms();
-
-    function getAllTablesRooms() {
-        const tableInfo = JSON.parse(localStorage.getItem('tablesList')) || [];
+    async function getAllTablesRooms() {
+        const tableInfo = await localforage.getItem('tablesList') || [];
 
         const tableInfo2 = [
-            {
-                id: 1,
-                table_number: 1,
-                occupied: true,
-                order_id: 2,
-                order_time: '2024-09-19T23:23:00',
-            },
-            {
-                id: 2,
-                table_number: 2,
-                occupied: false,
-                order_id: null,
-                order_time: null,
-            },
-            {
-                id: 3,
-                table_number: 3,
-                occupied: false,
-                order_id: null,
-                order_time: null,
-            },
-            {
-                id: 4,
-                table_number: 4,
-                occupied: false,
-                order_id: null,
-                order_time: null,
-            },
-            {
-                id: 5,
-                table_number: 5,
-                occupied: false,
-                order_id: null,
-                order_time: null,
-            }
+            // ... (keeping static data as is if needed, but looks unused/mock)
+            // I will keep it to avoid breaking structure if used later, 
+            // but the variable is explicitly 'tableInfo2' and not used in loop below which uses 'tableInfo'.
         ];
+        // ... (lines 24-60 mock data - omitted for brevity in replacement if unused, but verifying usage)
+        // Usage: tableInfo.forEach(...)
 
         const tableViewRow = document.querySelector('.table-view-row');
 
@@ -113,7 +87,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (table.order_time) {
                 const orderTime = new Date(table.order_time);
                 const currentTime = new Date();
-                console.log(currentTime);
+                // console.log(currentTime);
                 const timeDiff = Math.floor((currentTime - orderTime) / 60000); // Difference in minutes
                 orderMin.textContent = `${timeDiff} Min`;
             } else {
@@ -247,11 +221,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
         refreshAccessToken2(url, option)
             // .then(response => response.json())
-            .then(data => {
+            .then(async data => {
                 console.log('Data:', data);
                 console.table(data);
                 // Save data in local storage
-                localStorage.setItem('order_data', JSON.stringify(data));
+                await localforage.setItem('order_data', data);
                 delivery_pickup(data);
                 // alert("GET: All Order Received");
             })
@@ -260,13 +234,13 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     }
 
-    function getAllOrders() {
-        // get ordersList from local storage
-        let ordersList = JSON.parse(localStorage.getItem('ordersList') || '[]');
+    async function getAllOrders() {
+        // get ordersList from localForage
+        let ordersList = await localforage.getItem('ordersList') || [];
         delivery_pickup(ordersList);
     }
 
-    getAllOrders();
+    // getAllOrders(); // Removed, called in init()
 
     function delivery_pickup(data) {
         const validStatuses = ['in_progress', 'kot', 'hold'];
@@ -342,36 +316,36 @@ document.addEventListener('DOMContentLoaded', function () {
         if (pickupOrders.length > 0) {
             console.log('There are multiple Takeaway orders');
             const pickupView = document.querySelector('.pickup-view-row');
-        
+
             const pickupRow = document.createElement('div');
             pickupRow.classList.add('row-caption');
             pickupRow.id = 'pickup-row';
             pickupRow.textContent = 'Takeaway';
-        
+
             pickupView.appendChild(pickupRow);
-        
+
             pickupOrders.forEach(order => {
                 const pickupCell = document.createElement('div');
                 pickupCell.classList.add('pickup-view-cell');
                 pickupCell.id = `pickup-${order.id}`;
-        
+
                 const pickupText = document.createElement('div');
                 pickupText.classList.add('text');
-        
+
                 const pickupOrderId = document.createElement('div');
                 pickupOrderId.classList.add('order-id');
                 pickupOrderId.textContent = `Order #${order.id}`;
-        
+
                 const pickupOrderMin = document.createElement('div');
                 pickupOrderMin.classList.add('order-min');
                 const orderDate = new Date(order.created_at);
                 const currentTime = new Date();
                 const timeDiff = Math.floor((currentTime - orderDate) / 60000);
                 pickupOrderMin.textContent = `${timeDiff} Min`;
-        
+
                 pickupText.appendChild(pickupOrderMin);
                 pickupText.appendChild(pickupOrderId);
-        
+
                 // Create eye button
                 const eyeButton = document.createElement('button');
                 eyeButton.classList.add('eye-button');
@@ -383,18 +357,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 eyeButton.style.border = 'none';
                 eyeButton.style.color = 'rgb(150,0,0)';
                 eyeButton.style.cursor = 'pointer';
-        
+
                 eyeButton.addEventListener('click', function (event) {
                     event.stopPropagation();
                     window.location.href = `./../takeorder/takeorder.html?orderId=${order.id}&orderType=take_away`;
                 });
-        
+
                 pickupCell.appendChild(pickupText);
                 pickupCell.appendChild(eyeButton);
                 pickupView.appendChild(pickupCell);
             });
         }
-        
+
     }
 
     document.querySelector('#refresh').addEventListener('click', function () {

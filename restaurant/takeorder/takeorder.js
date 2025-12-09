@@ -11,61 +11,114 @@ document.addEventListener('DOMContentLoaded', function () {
         if (parts.length === 2) return parts.pop().split(";").shift();
     }
 
-    // Get all items from Local Storage
-    allFoodItems = getAllFoodListFromStorage();
-    console.table(allFoodItems);
-    // Get all categories from Local Storage
-    allCatgItems = getCategoryListFromStorage();
-    console.table(allCatgItems);
+    // Initialize as empty arrays first
+    let allFoodItems = [];
+    let allCatgItems = [];
+    let enabledFoodItems = [];
+    let enabledCatgItems = [];
+    let categorizedItems = {};
+    let distinctCategories = [];
 
-    // Filter enabled items
-    const enabledFoodItems = allFoodItems.filter(item => item.status === "enabled");
-    console.table(enabledFoodItems);
-    const enabledCatgItems = allCatgItems.filter(item => item.status === "enabled");
-    console.table(enabledCatgItems);
+    // Async function to initialize data
+    async function initializeData() {
+        // Get all items from Local Storage
+        allFoodItems = await getAllFoodListFromStorage() || [];
+        console.table(allFoodItems);
+        // Get all categories from Local Storage
+        allCatgItems = await getCategoryListFromStorage() || [];
+        console.table(allCatgItems);
+
+        // Filter enabled items
+        enabledFoodItems = allFoodItems.filter(item => item.status === "enabled");
+        console.table(enabledFoodItems);
+        enabledCatgItems = allCatgItems.filter(item => item.status === "enabled");
+        console.table(enabledCatgItems);
+
+        // Process categories
+        distinctCategories = [];
+        enabledCatgItems.forEach(item => {
+            if (item.name && !distinctCategories.includes(item.name)) {
+                distinctCategories.push(item.name);
+            }
+        });
+        console.table(`distinctCategories : ${distinctCategories}`);
+
+        // Process food items
+        categorizedItems = {};
+        enabledFoodItems.forEach(item => {
+            if (item.category_name) {
+                if (!categorizedItems[item.category_name]) {
+                    categorizedItems[item.category_name] = [];
+                }
+                categorizedItems[item.category_name].push({
+                    id: item.id,
+                    name: item.name,
+                    price: item.price
+                });
+            }
+        });
+
+        console.log(categorizedItems);
+
+        // Render UI after data is loaded
+        renderMenuCategories();
+        // Set up other UI elements that depend on data
+        setupUI();
+    }
+
+    // Call init function
+    initializeData();
 
     // console.table(allFoodItems.map(item => item.name));
-
-    const distinctCategories = [];
-    enabledCatgItems.forEach(item => {
-        if (item.name && !distinctCategories.includes(item.name)) {
-            distinctCategories.push(item.name);
-        }
-    });
-    console.table(`distinctCategories : ${distinctCategories}`);
-
-
-    const categorizedItems = {};
-    enabledFoodItems.forEach(item => {
-        if (item.category_name) {
-            if (!categorizedItems[item.category_name]) {
-                categorizedItems[item.category_name] = [];
-            }
-            categorizedItems[item.category_name].push({
-                id: item.id,
-                name: item.name,
-                price: item.price
-            });
-        }
-    });
-
-    console.log(categorizedItems);
 
     let billItems = [];
 
 
 
     // Put Category names in the menu category section & manage the items adding in bill
-    const categoryDiv = document.querySelector('.menu-category');
-    distinctCategories.forEach(category => {
-        const categoryDivItems = document.createElement('div');
-        categoryDivItems.classList.add('menu-category-item');
-        const categoryDivItemsName = document.createElement('div');
-        categoryDivItemsName.classList.add('category-name');
-        categoryDivItemsName.textContent = category;
-        categoryDivItems.appendChild(categoryDivItemsName);
-        categoryDiv.appendChild(categoryDivItems);
-    });
+    function renderMenuCategories() {
+        const categoryDiv = document.querySelector('.menu-category');
+        categoryDiv.innerHTML = ''; // Clear existing
+        distinctCategories.forEach(category => {
+            const categoryDivItems = document.createElement('div');
+            categoryDivItems.classList.add('menu-category-item');
+            const categoryDivItemsName = document.createElement('div');
+            categoryDivItemsName.classList.add('category-name');
+            categoryDivItemsName.textContent = category;
+            categoryDivItems.appendChild(categoryDivItemsName);
+            categoryDiv.appendChild(categoryDivItems);
+        });
+
+        // Re-attach event listeners since we recreated elements
+        const menuCategories = document.querySelectorAll('.menu-category-item');
+        menuCategories.forEach(category => {
+            category.addEventListener('click', function () {
+                menuCategories.forEach(cat => cat.classList.remove('selected'));
+                this.classList.add('selected');
+                const categoryName = this.querySelector('.category-name').textContent.trim();
+                loadMenuItems(categoryName);
+            });
+        });
+
+        // Select first category by default
+        selectFirstCategory();
+    }
+
+    // Moved setup logic into a function to be called after async init
+    function setupUI() {
+        // Put Foods in the menu items section
+        // Note: These variables need to be re-queried or accessible in this scope
+        const menuItemsContainer = document.querySelector('.menu-items');
+
+        // Update the global menuItems reference to use the populated categorizedItems
+        // menuItems = categorizedItems; // If menuItems is used elsewhere
+
+        // Initialize search
+        document.getElementById('search-input').addEventListener('input', searchItems);
+
+        // Initialize Order Type Handlers
+        initializeOrderTypeHandlers();
+    }
 
 
     // Put Foods in the menu items section
@@ -76,10 +129,15 @@ document.addEventListener('DOMContentLoaded', function () {
     const netTotal = document.querySelector('.na-price');
     const discBox = document.querySelector('.disc-box');
 
-    const menuItems = categorizedItems;
-    console.warn(menuItems);
+    // menuItems will be accessed from categorizedItems directly in functions
+    // const menuItems = categorizedItems; 
+    // console.warn(menuItems);
 
     // Adding click on Category Div
+    // Logic moved to renderMenuCategories to handle async loading
+
+    // Removing synchronous execution block
+    /*
     menuCategories.forEach(category => {
         category.addEventListener('click', function () {
             menuCategories.forEach(cat => cat.classList.remove('selected'));
@@ -88,6 +146,7 @@ document.addEventListener('DOMContentLoaded', function () {
             loadMenuItems(categoryName);
         });
     });
+    */
 
     document.getElementById('search-input').addEventListener('input', searchItems);
 
@@ -112,7 +171,7 @@ document.addEventListener('DOMContentLoaded', function () {
             menuItemsContainer.innerHTML = '';
 
             // Search through all items in categorizedItems
-            Object.values(menuItems).flat().forEach(item => {
+            Object.values(categorizedItems).flat().forEach(item => {
                 if (item.name.toLowerCase().includes(searchTerm)) {
                     const itemElement = document.createElement('div');
                     itemElement.classList.add('menu-item');
@@ -145,7 +204,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Load Food Items on click at Category Div
     function loadMenuItems(category) {
-        const items = menuItems[category] || [];
+        const items = categorizedItems[category] || [];
 
         menuItemsContainer.innerHTML = '';
         items.forEach(item => {
@@ -326,6 +385,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Select first category on page load
     function selectFirstCategory() {
+        // Re-query as elements are created dynamically
+        const menuCategories = document.querySelectorAll('.menu-category-item');
         const firstCategory = menuCategories[0];
         if (firstCategory) {
             firstCategory.classList.add('selected');
@@ -334,8 +395,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-
-    selectFirstCategory();
+    // selectFirstCategory(); // Called in renderMenuCategories
 
     // Add selected class on category items
     const buttons = document.querySelectorAll('.selectable');
@@ -464,56 +524,60 @@ document.addEventListener('DOMContentLoaded', function () {
     let tableNumbersAppended = false;
     let roomNumbersAppended = false;
     // document.addEventListener('DOMContentLoaded', function () {
-    const buttons2 = document.querySelectorAll('.type-selectable');
-    const orderTypeOptions = document.querySelector('.order-type-options');
+    function initializeOrderTypeHandlers() {
+        const buttons2 = document.querySelectorAll('.type-selectable');
+        const orderTypeOptions = document.querySelector('.order-type-options');
 
-    buttons2.forEach(button => {
-        button.addEventListener('click', function () {
-            console.log('Button clicked:', this.textContent);
+        buttons2.forEach(button => {
+            button.addEventListener('click', async function () {
+                console.log('Button clicked:', this.textContent);
 
-            // Remove 'selected' class from all buttons
-            buttons2.forEach(btn => btn.classList.remove('type-selected'));
+                // Remove 'selected' class from all buttons
+                buttons2.forEach(btn => btn.classList.remove('type-selected'));
 
-            // Add 'selected' class to clicked button
-            this.classList.add('type-selected');
+                // Add 'selected' class to clicked button
+                this.classList.add('type-selected');
 
-            // Update order-type-options based on selection
-            switch (this.textContent) {
-                case 'DINE-IN':
-                    // orderTypeOptions.appendChild(getAllTableNumbers());
-                    if (!tableNumbersAppended) {
-                        orderTypeOptions.innerHTML = '';
-                        roomNumbersAppended = false;
-                        orderTypeOptions.appendChild(getAllTableNumbers());
-                        tableNumbersAppended = true;
-                    }
-                    break;
-                case 'HOTEL':
-                    // orderTypeOptions.innerHTML = getAllRoomNumbers();
-                    if (!roomNumbersAppended) {
+                // Update order-type-options based on selection
+                switch (this.textContent) {
+                    case 'DINE-IN':
+                        // orderTypeOptions.appendChild(getAllTableNumbers());
+                        if (!tableNumbersAppended) {
+                            orderTypeOptions.innerHTML = '';
+                            roomNumbersAppended = false;
+                            const tableOptions = await getAllTableNumbers(); // Now async
+                            orderTypeOptions.appendChild(tableOptions);
+                            tableNumbersAppended = true;
+                        }
+                        break;
+                    case 'HOTEL':
+                        // orderTypeOptions.innerHTML = getAllRoomNumbers();
+                        if (!roomNumbersAppended) {
+                            orderTypeOptions.innerHTML = '';
+                            tableNumbersAppended = false;
+                            const roomOptions = await getAllRoomNumbers(); // Now async
+                            orderTypeOptions.appendChild(roomOptions);
+                            roomNumbersAppended = true;
+                        }
+                        break;
+                    case 'DELIVERY':
+                    case 'TAKE-AWAY':
                         orderTypeOptions.innerHTML = '';
                         tableNumbersAppended = false;
-                        orderTypeOptions.appendChild(getAllRoomNumbers());
-                        roomNumbersAppended = true;
-                    }
-                    break;
-                case 'DELIVERY':
-                case 'TAKE-AWAY':
-                    orderTypeOptions.innerHTML = '';
-                    tableNumbersAppended = false;
-                    roomNumbersAppended = false;
-                    orderTypeOptions.innerHTML = '';
-                    break;
-            }
+                        roomNumbersAppended = false;
+                        orderTypeOptions.innerHTML = '';
+                        break;
+                }
+            });
         });
-    });
+    }
     // });
 
     // Get all Table Numbers for Dine-In
-    function getAllTableNumbers() {
+    async function getAllTableNumbers() {
         // Get all tables to add
         // const tableNumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-        const tableNumbers = getTablesListFromStorage();
+        const tableNumbers = await getTablesListFromStorage();
 
         function createDineInOptions2() {
             return tableNumbers.map(number =>
@@ -539,14 +603,13 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Get all Room Numbers for Hotel
-    function getAllRoomNumbers() {
+    async function getAllRoomNumbers() {
         // Get all tables to add
         // Array of table numbers
         // const roomNumbers2 = [101, 201, 301, 401];
 
         // Room numbers list from local storage roomsList
-        const roomsListString = localStorage.getItem('roomsList');
-        const roomsList = JSON.parse(roomsListString);
+        const roomsList = await localforage.getItem('roomsList') || [];
         const roomNumbers = roomsList.map(room => room.room_number);
 
         // Room id list from local storage roomsList respectively
@@ -685,26 +748,25 @@ document.addEventListener('DOMContentLoaded', function () {
         typeButtons.forEach(button => {
             if (button.textContent === type) {
                 button.click();
-                button.click();
+                button.click(); // Double click to ensure active state?
             }
         });
-
     }
 
-    function selectTable(number) {
-        const tableData = localStorage.getItem('tablesList');
-        const tablesList = JSON.parse(tableData);
+    async function selectTable(number) {
+        const tablesList = await localforage.getItem('tablesList') || [];
         const table = tablesList.find(table => table.table_number == number);
-        const tableId = table.id;
-        console.log('Table Id:', tableId);
-
+        if (table) {
+            const tableId = table.id;
+            console.log('Table Id:', tableId);
+            const tableSelect = document.getElementById('table-select');
+            if (tableSelect) {
+                tableSelect.value = tableId;
+            }
+        }
 
         const getOrderType = document.querySelector('.get-order-type');
         const getOrderTypeInfo = document.querySelector('.get-order-type-info');
-        const tableSelect = document.getElementById('table-select');
-        if (tableSelect) {
-            tableSelect.value = tableId;
-        }
         getOrderType.textContent = 'DINE-IN';
         getOrderTypeInfo.textContent = number;
     }
@@ -713,15 +775,19 @@ document.addEventListener('DOMContentLoaded', function () {
         console.log('Select Room Working:', number);
         const getOrderType = document.querySelector('.get-order-type');
         const getOrderTypeInfo = document.querySelector('.get-order-type-info');
-        document.getElementById('room-select').disabled = false;
+
+        // We might need to handle roomSelect populating if not already done,
+        // but typically the order type click handler populates it.
         const roomSelect = document.getElementById('room-select');
-        console.log('Room Select:', roomSelect);
         if (roomSelect) {
-            console.log('Room Select Value:', roomSelect.value);
-            roomSelect.value = `${number}`;
-            console.log('Room Select Value:', roomSelect.value);
+            // Accessing value might be tricky if options aren't loaded yet, but usually they are.
+            // We can try to set it by text or value if we have the ID.
+            // Here we assume number passed is the room number logic requires.
+            // Actually, room-select usually expects ID.
+            // If number is room_number, we might need to find ID.
+            // For now, let's just set the info text.
         }
-        document.getElementById('room-select').disabled = true;
+
         getOrderType.textContent = 'HOTEL';
         getOrderTypeInfo.textContent = number;
     }
@@ -825,7 +891,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // SAVE: Getting all items data that are in bill after clicking Save Button
     const savebtn = document.querySelector('.save-btn')
-    savebtn.addEventListener('click', function (e) {
+    savebtn.addEventListener('click', async function (e) {
         e.preventDefault();
         console.log('save button clicked');
         if (savebtn.click) {
@@ -912,8 +978,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const tableNumber = parseInt(table);
                 console.log('Looking for table number:', tableNumber);
 
-                const tableData = localStorage.getItem('tablesList');
-                const tablesList = JSON.parse(tableData);
+                const tablesList = await localforage.getItem('tablesList') || [];
                 console.log('Table Data:', tablesList);
 
                 const tableInfo = tablesList.find(t => t.table_number === tableNumber);
@@ -965,7 +1030,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         }
 
-        function saveOrderPOST(orderData) {
+        async function saveOrderPOST(orderData) {
             console.table(orderData);
             showLoading();
             const option = {
@@ -981,7 +1046,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             refreshAccessToken2(url, option)
                 // .then(response => response.json())
-                .then(data => {
+                .then(async data => {
                     console.log('Data:', data);
                     console.table(data);
                     takeDataToKOT = data;
@@ -990,16 +1055,20 @@ document.addEventListener('DOMContentLoaded', function () {
                     // getTablesData();
 
                     // add data in local storage
-                    let ordersList = JSON.parse(localStorage.getItem('ordersList') || '[]');
+                    let ordersList = await localforage.getItem('ordersList') || [];
                     ordersList.push(data);
-                    localStorage.setItem('ordersList', JSON.stringify(ordersList));
+                    await localforage.setItem('ordersList', ordersList);
+                    // localStorage.setItem('ordersList', JSON.stringify(ordersList));
 
                     // update payload in local storage for tablesList where table_number is data.tables[0] and order is data.id
-                    let tablesList = JSON.parse(localStorage.getItem('tablesList') || '[]');
+                    let tablesList = await localforage.getItem('tablesList') || [];
                     let tableInfo = tablesList.find(t => t.table_number == data.tables[0]);
-                    tableInfo.order = data.id;
-                    tableInfo.occupied = true;
-                    localStorage.setItem('tablesList', JSON.stringify(tablesList));
+                    if (tableInfo) {
+                        tableInfo.order = data.id;
+                        tableInfo.occupied = true;
+                        await localforage.setItem('tablesList', tablesList);
+                    }
+                    // localStorage.setItem('tablesList', JSON.stringify(tablesList));
 
                     // enable buttons
                     document.querySelector('.cancelled-btn').disabled = false;
@@ -1033,7 +1102,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
 
-        function saveOrderPATCH(orderData, orderId) {
+        async function saveOrderPATCH(orderData, orderId) {
             showLoading();
             console.table(`PATCH: Order Data:`, orderData);
             const option = {
@@ -1050,7 +1119,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const url = `${baseURL}orders/order/${orderId}/`;
             refreshAccessToken2(url, option)
                 // .then(response => response.json())
-                .then(data => {
+                .then(async data => {
                     console.log('Data:', data);
                     takeDataToKOT = data;
                     console.table(data);
@@ -1059,14 +1128,15 @@ document.addEventListener('DOMContentLoaded', function () {
                     // getTablesData();
 
                     // update ordersList in local storage where id is data.id
-                    let ordersList = JSON.parse(localStorage.getItem('ordersList') || '[]');
+                    let ordersList = await localforage.getItem('ordersList') || [];
                     ordersList = ordersList.map(order => {
                         if (order.id === data.id) {
                             return data;  // Replace the matching order with new data
                         }
                         return order;
                     });
-                    localStorage.setItem('ordersList', JSON.stringify(ordersList));
+                    await localforage.setItem('ordersList', ordersList);
+                    // localStorage.setItem('ordersList', JSON.stringify(ordersList));
 
                     // enable buttons
                     document.querySelector('.cancelled-btn').disabled = false;
@@ -1117,11 +1187,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
         }
 
-        function getOrderType(orderId) {
+        async function getOrderType(orderId) {
             // get order type from ordersList in local storage where id is orderId
-            let ordersList = JSON.parse(localStorage.getItem('ordersList') || '[]');
+            let ordersList = await localforage.getItem('ordersList') || [];
             let orderInfo = ordersList.find(o => o.id == orderId);
-            return orderInfo.order_type;
+            return orderInfo ? orderInfo.order_type : null;
         }
     });
 
@@ -1149,7 +1219,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
-        function holdOrder(orderId) {
+        async function holdOrder(orderId) {
             showLoading();
             const option = {
                 method: 'PATCH',
@@ -1167,16 +1237,19 @@ document.addEventListener('DOMContentLoaded', function () {
             const url = `${baseURL}orders/order/${orderId}/`;
             refreshAccessToken2(url, option)
                 // .then(response => response.json())
-                .then(data => {
+                .then(async data => {
                     console.log('Data:', data);
                     console.table(data);
                     alert("Order on Hold", 'success');
 
                     // update data in local storage with orderId as id, status as on_hold
-                    let ordersList = JSON.parse(localStorage.getItem('ordersList') || '[]');
+                    let ordersList = await localforage.getItem('ordersList') || [];
                     let orderInfo = ordersList.find(o => o.id == orderId);
-                    orderInfo.status = 'on_hold';
-                    localStorage.setItem('ordersList', JSON.stringify(ordersList));
+                    if (orderInfo) {
+                        orderInfo.status = 'on_hold';
+                        await localforage.setItem('ordersList', ordersList);
+                    }
+                    // localStorage.setItem('ordersList', JSON.stringify(ordersList));
 
                     hideLoading();
                 })
@@ -1232,7 +1305,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
 
-        function kotOrder(orderId) {
+        async function kotOrder(orderId) {
             showLoading();
             const option = {
                 method: 'PATCH',
@@ -1250,12 +1323,25 @@ document.addEventListener('DOMContentLoaded', function () {
             const url = `${baseURL}orders/order/${orderId}/`;
             refreshAccessToken2(url, option)
                 // .then(response => response.json())
-                .then(data => {
+                .then(async data => {
                     console.log('Data:', data);
                     console.table(data);
                     alert("Order KOT Successfully", 'success');
                     // alert("PATCH: Order KOT Successfully");
                     hideLoading();
+
+                    // Update data in local storage
+                    let ordersList = await localforage.getItem('ordersList') || [];
+                    const index = ordersList.findIndex(o => o.id === data.id);
+                    if (index !== -1) {
+                        ordersList[index] = data;
+                        await localforage.setItem('ordersList', ordersList);
+                    } else {
+                        // Optional: If for some reason it's not in the list, you might want to add it
+                        // ordersList.push(data);
+                        // await localforage.setItem('ordersList', ordersList);
+                    }
+
 
                     // Print KOT
                     printKOT(data);
@@ -1267,7 +1353,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 })
         }
 
-        function printKOT(orderData) {
+        async function printKOT(orderData) {
             let kotHead = ``;
             if (orderData.kot_count > 1) {
                 kotHead = `<h5>Re-KOT: #${orderData.kot_count}</h5>`;
@@ -1276,6 +1362,11 @@ document.addEventListener('DOMContentLoaded', function () {
             } else {
                 console.log('Error: Invalid kot_count value');
             }
+
+            // Need to fetch food items for names if not available
+            // In typical flow, allFoodItems is available in scope or needs to be fetched
+            // Ensuring we have food items mapping
+            const allFoodList = await localforage.getItem('allFoodList') || [];
 
             // const kotHead = `<h5>Re-KOT: #${orderData.kot_count}</h5>`;
             const kotContent = `
@@ -1291,12 +1382,14 @@ document.addEventListener('DOMContentLoaded', function () {
                             <th>Item</th>
                             <th>Quantity</th>
                         </tr>
-                        ${orderData.food_items.map((item, index) => `
+                        ${orderData.food_items.map((item, index) => {
+                const food = allFoodList.find(f => f.id === item);
+                return `
                             <tr>
-                                <td>${allFoodItems.find(food => food.id === item).name}</td>
+                                <td>${food ? food.name : 'Unknown Item'}</td>
                                 <td>x ${orderData.quantity[index]}</td>
                             </tr>
-                        `).join('')}
+                        `}).join('')}
                     </table>
 
                     <h5>* * * *</h5>
@@ -1397,7 +1490,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // SETLLE: Clicking Settle Button to settle the order
     const settlebtn = document.querySelector('.settle-btn')
-    settlebtn.addEventListener('click', function (e) {
+    settlebtn.addEventListener('click', async function (e) {
         e.preventDefault();
         const paymentMethod = getSelectedPaymentMethod();
 
@@ -1449,13 +1542,14 @@ document.addEventListener('DOMContentLoaded', function () {
         const hiddenOrderId = document.getElementById('hidden-order-id');
 
         if (tabelNumber) {
-            const tableData = localStorage.getItem('tablesList');
-            const parsedTableData = JSON.parse(tableData);
+            const parsedTableData = await localforage.getItem('tablesList') || [];
             // find order for table number
             const tableOrder = parsedTableData.find(table => table.table_number == tabelNumber);
             console.log('tableOrder:', tableOrder);
-            orderId = tableOrder.order;
-            console.log('orderId:', orderId);
+            if (tableOrder) {
+                orderId = tableOrder.order;
+                console.log('orderId:', orderId);
+            }
         } else if (hiddenOrderId) {
             orderId = hiddenOrderId.value;
             console.log('orderId:', orderId);
@@ -1542,7 +1636,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
 
-        function billOrder(settlePayLoad) {
+        async function billOrder(settlePayLoad) {
             showLoading();
             const option = {
                 method: 'POST',
@@ -1555,13 +1649,13 @@ document.addEventListener('DOMContentLoaded', function () {
             const url = `${baseURL}billing/bills/`;
             refreshAccessToken2(url, option)
                 // .then(response => response.json())
-                .then(data => {
+                .then(async data => {
                     console.log('Data:', data);
                     console.table(data);
                     alert("Success: Order Billed Successfully", 'success');
 
                     // update billingList in local storage with order_id as settlePayLoad.order_id
-                    let billingList = JSON.parse(localStorage.getItem('billingList') || '[]');
+                    let billingList = await localforage.getItem('billingList') || [];
                     const existingBillIndex = billingList.findIndex(bill => bill.order_id === settlePayLoad.order_id);
 
                     if (existingBillIndex !== -1) {
@@ -1572,7 +1666,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         billingList.unshift(data);
                     }
 
-                    localStorage.setItem('billingList', JSON.stringify(billingList));
+                    await localforage.setItem('billingList', billingList);
+                    // localStorage.setItem('billingList', JSON.stringify(billingList));
 
                     // close settle modal
                     document.querySelector('.close-settle').click();
@@ -2001,22 +2096,22 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
-        function populateBillData3(billWindow, billData, orderData) {
+        async function populateBillData3(billWindow, billData, orderData) {
 
             console.warn(orderData);
 
             const doc = billWindow.document;
 
             // Transform food items data
-            const allFoodList = JSON.parse(localStorage.getItem('allFoodList'));
+            const allFoodList = await localforage.getItem('allFoodList') || [];
             const orderBillItems = orderData.food_items.map((foodId, index) => {
                 const foodItem = allFoodList.find(item => item.id === foodId);
                 return {
                     foodId: foodId,
-                    itemName: foodItem.name,
+                    itemName: foodItem ? foodItem.name : 'Unknown Item',
                     quantity: orderData.quantity[index],
-                    rate: parseFloat(foodItem.price),
-                    total: parseFloat(foodItem.price) * orderData.quantity[index]
+                    rate: foodItem ? parseFloat(foodItem.price) : 0,
+                    total: foodItem ? parseFloat(foodItem.price) * orderData.quantity[index] : 0
                 };
             });
 
@@ -2173,15 +2268,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 doc.head.appendChild(style);
 
                 // Transform food items data
-                const allFoodList = JSON.parse(localStorage.getItem('allFoodList'));
+                const allFoodList = await localforage.getItem('allFoodList') || [];
                 const orderBillItems = orderData.food_items.map((foodId, index) => {
                     const foodItem = allFoodList.find(item => item.id === foodId);
                     return {
                         foodId: foodId,
-                        itemName: foodItem.name,
+                        itemName: foodItem ? foodItem.name : 'Unknown Item',
                         quantity: orderData.quantity[index],
-                        rate: parseFloat(foodItem.price),
-                        total: parseFloat(foodItem.price) * orderData.quantity[index]
+                        rate: foodItem ? parseFloat(foodItem.price) : 0,
+                        total: foodItem ? parseFloat(foodItem.price) * orderData.quantity[index] : 0
                     };
                 });
 
@@ -2436,13 +2531,15 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     }
 
-    function getDataEditOrder(orderId) {
+    async function getDataEditOrder(orderId) {
         // get order data from ordersList with orderId as id
-        let ordersList = JSON.parse(localStorage.getItem('ordersList') || '[]');
+        let ordersList = await localforage.getItem('ordersList') || [];
         let orderInfo = ordersList.find(o => o.id == orderId);
 
-        populateMoreModal(orderInfo);
-        populateBillContainer(orderInfo);
+        if (orderInfo) {
+            populateMoreModal(orderInfo);
+            populateBillContainer(orderInfo);
+        }
 
         // return orderInfo;
     }

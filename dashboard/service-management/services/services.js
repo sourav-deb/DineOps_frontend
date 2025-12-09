@@ -1,48 +1,57 @@
 
 // Putting Options in category list
-function putCategoryInSelect() {
+
+// Putting Options in category list
+async function putCategoryInSelect() {
     let selectCategory = document.getElementById('new-item-catg');     // Create
-    categoryData = getServiceCategoryListFromStorage();
+    const categoryData = await getServiceCategoryListFromStorage() || [];
     console.log('Items.js called........')
-    console.table(categoryData);
+    // console.table(categoryData);
 
     // Insert options in selectCategory
-    categoryData.forEach(category => {
-        const option = document.createElement('option');
-        option.value = category.id;
-        option.textContent = category.name;
-        selectCategory.appendChild(option);
-    });
+    if (selectCategory) {
+        selectCategory.innerHTML = '<option value="" disabled selected>Select Category</option>';
+        categoryData.forEach(category => {
+            const option = document.createElement('option');
+            option.value = category.id;
+            option.textContent = category.name;
+            selectCategory.appendChild(option);
+        });
+    }
 
 
     // Put in Modal Select
     let editModalCategory = document.getElementById('editCategory');  // Modal
-    categoryData = getServiceCategoryListFromStorage();
+    const categoryDataModal = await getServiceCategoryListFromStorage() || [];
     console.log('Items.js called........')
-    console.table(categoryData);
+    // console.table(categoryData);
 
     // Insert options in selectCategory
-    categoryData.forEach(category => {
-        const option = document.createElement('option');
-        option.value = category.id;
-        option.textContent = category.name;
-        editModalCategory.appendChild(option);
-    });
+    if (editModalCategory) {
+        editModalCategory.innerHTML = '<option value="" disabled selected>Select Category</option>';
+        categoryDataModal.forEach(category => {
+            const option = document.createElement('option');
+            option.value = category.id;
+            option.textContent = category.name;
+            editModalCategory.appendChild(option);
+        });
+    }
 
 }
 
 putCategoryInSelect();
 
 // Add New Item to List
-function addItemToList(name, price, categoryid, description, status, id) {
-    console.log(name, price, categoryid, description, status, id);
+async function addItemToList(name, price, categoryid, description, status, id) {
+    // console.log(name, price, categoryid, description, status, id);
     const itemsContainer = document.querySelector('.all-list-table-items');
+    if (!itemsContainer) return;
 
     // get category name from category id from local storage serviceList
-    const categoryData = JSON.parse(localStorage.getItem('serviceCategoryList')); 
-    const category = categoryData.find(cat => cat.id === categoryid); 
-    const categoryName = category ? category.name : 'Unknown'; 
-    console.log(categoryName); 
+    const categoryData = await localforage.getItem('serviceCategoryList') || [];
+    const category = categoryData.find(cat => cat.id === categoryid);
+    const categoryName = category ? category.name : 'Unknown';
+    // console.log(categoryName); 
 
     const itemHTML = `
         <div class="record-row">
@@ -97,14 +106,11 @@ function deleteFood(id) {
 }
 
 // Local Storage Call to get Category ID by Category Name from localStorage
-function getCatgIdByName(name) {
-    const categoryData = getServiceListFromStorage();
-    const category = categoryData.find(category => category.name === name);
-    return category ? category.id : null;
-}
+// Deprecated/Unused or needs async if used.
+// function getCatgIdByName(name) { ... } 
 
 // Open Update Modal
-function openEditModal(name, price, category, description, status, id) {
+async function openEditModal(name, price, categoryId, description, status, id) {
     const modal = document.getElementById('editModal');
     const editName = document.getElementById('editName');
     const editPrice = document.getElementById('editPrice');
@@ -130,14 +136,27 @@ function openEditModal(name, price, category, description, status, id) {
 
     editName.value = name;
     editPrice.value = price;
-    editCategory.value = getCatgIdByName(category);
+
+    // categoryId is passed directly now, checking if we need to fetch name or just set value
+    // Assuming editCategory is the Select element populated with IDs
+    editCategory.value = categoryId;
+
+    // Legacy support if categoryId passed was a name (unlikely based on usage)
+    if (!editCategory.value && typeof categoryId === 'string') {
+        // Attempt to find by name if setting by ID failed
+        const categoryData = await getServiceCategoryListFromStorage() || [];
+        const cat = categoryData.find(c => c.name === categoryId);
+        if (cat) editCategory.value = cat.id;
+    }
+
+
     editDescription.value = description;
     editStatusText.textContent = status;
 
 
     console.log(status);
 
-    if (status === true) {
+    if (status === true || status === 'true') {
         console.log(status);
         editStatus.checked = true;
         // var statusText = 'enabled';
@@ -146,14 +165,8 @@ function openEditModal(name, price, category, description, status, id) {
         editStatus.checked = false;
     }
 
-    // Pre-select the category in the dropdown
-    const categoryOptions = editCategory.options;
-    for (let i = 0; i < categoryOptions.length; i++) {
-        if (categoryOptions[i].value == category) {
-            categoryOptions[i].selected = true;
-            break;
-        }
-    }
+    // Pre-select logic is handled by assigning .value above, but double check
+    // const categoryOptions = editCategory.options; ...
 
     modal.style.display = 'block';
 }
@@ -231,7 +244,7 @@ document.getElementById('update-item').addEventListener('click', function (e) {
             .then(() => { // This will execute after getServiceList() completes
                 alert("Food Service Created Successfully", 'success');
                 document.querySelector('.close').click();
-                coldReload();   
+                coldReload();
             })
             .catch(error => {
                 console.error('Error updating Service:', error);
@@ -247,18 +260,22 @@ document.getElementById('update-item').addEventListener('click', function (e) {
 // getAllFoodListFromStorage();
 
 
-if (foodData = getServiceListFromStorage()) {
-    console.log('Food Data:', foodData);
-    passToFoodList(foodData);
-} else {
-    console.log('No data in storage');
+async function initServiceList() {
+    const foodData = await getServiceListFromStorage();
+    if (foodData) {
+        console.log('Food Data:', foodData);
+        await passToFoodList(foodData);
+    } else {
+        console.log('No data in storage');
+    }
 }
+initServiceList();
 
-function passToFoodList(data) {
-    data.forEach(item => {
-        console.log(item);
-        addItemToList(item.name, item.price, item.category, item.description, item.status, item.id);
-    });
+async function passToFoodList(data) {
+    for (const item of data) {
+        // console.log(item);
+        await addItemToList(item.name, item.price, item.category, item.description, item.status, item.id);
+    }
 }
 
 // API Call POST Food Items - Create
@@ -369,7 +386,7 @@ function refreshCategoryList() {
     const button = document.querySelector('#refresh-btn');
     button.classList.add('spinning');
     console.log('Refreshing Category List');
-    
+
     // Call your existing category fetch function here
     getServiceList()
         .then(() => {
@@ -383,7 +400,7 @@ function refreshCategoryList() {
             console.error('Error refreshing categories:', error);
             button.classList.remove('spinning');
         });
-    
+
 
 }
 
